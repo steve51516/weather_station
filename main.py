@@ -10,6 +10,7 @@ if __name__=="__main__":
     sensor = Sensor(0x77)
     db.make_table()
     data = {}
+    data['callsign'] = config['aprs']['callsign']
     for item in config['sensors']:
         if config['sensors'].getboolean(item) is False:
             data[item] = "..."
@@ -19,7 +20,6 @@ if __name__=="__main__":
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
         data['now'] = time.strftime('%H%M%S', time.gmtime())
-        data['call'] = 'NOCALL'
         pm25,pm10 = read_sds011(config)
         data['pm25'] = pm25
         data['pm10'] = pm10
