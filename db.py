@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 def make_table():
     try:
@@ -36,7 +37,7 @@ def read_save(data):
       print("Successfully Connected to SQLite")
       sqlite_insert_query = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
       VALUES(?, ?, ?, ?, ?, ?, ?);"""
-      data_tuple = (data['now'], data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+      data_tuple = (datetime.now(), data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
       cursor.execute(sqlite_insert_query, data_tuple)
       sqliteConnection.commit()
       print("Record inserted successfully into weather table ", cursor.rowcount)

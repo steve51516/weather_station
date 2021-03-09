@@ -19,7 +19,7 @@ if __name__=="__main__":
         data['pressure'] = round(tmp['pressure'], 1)
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
-        data['now'] = time.strftime('%H%M%S', time.gmtime())
+        data['ztime'] = time.strftime('%H%M%S', time.gmtime())
         pm25,pm10 = read_sds011(config)
         data['pm25'] = pm25
         data['pm10'] = pm10
