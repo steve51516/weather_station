@@ -5,14 +5,14 @@ from bme280pi import Sensor
 # in that order, and if a particular measurement is not present, 
 # the three numbers should be replaced by "..." to indicate no data available.
 def send_data(data, config, sendall=False):
-    data['longitude'] = ""
-    data['latitude'] = ""
-    data['wdir'] = "..." # 3 numbers represents wind direction in degrees from true north. This is the direction that the wind is blowing from.
-    data['avgwind'] = "..." # 3 numbers represents Average wind speed in MPH
-    data['peakwind'] = "..." # 3 numbers represents Peak wind speed
-    #data['temperature'] =  # The letter "t" followed by 3 characters (numbers and minus sign) represents the temperature in degrees F.
-    data['rain1h'] = "..." # The letter "r" followed by 3 numbers represents the amount of rain in hundredths of inches that fell the past hour.
-    data['rain24h'] = "..." # The letter "p" followed by 3 numbers represents the amount of rain in hundredths of inches that fell in the past 24 hours.
+    # data['longitude'] = ""
+    # data['latitude'] = ""
+    # data['wdir'] = "..." # 3 numbers represents wind direction in degrees from true north. This is the direction that the wind is blowing from.
+    # data['avgwind'] = "..." # 3 numbers represents Average wind speed in MPH
+    # data['peakwind'] = "..." # 3 numbers represents Peak wind speed
+    # data['temperature'] =  # The letter "t" followed by 3 characters (numbers and minus sign) represents the temperature in degrees F.
+    # data['rain1h'] = "..." # The letter "r" followed by 3 numbers represents the amount of rain in hundredths of inches that fell the past hour.
+    # data['rain24h'] = "..." # The letter "p" followed by 3 numbers represents the amount of rain in hundredths of inches that fell in the past 24 hours.
 
     if data['temperature'] < 100 and data['temperature'] > 9: # Add 0 in front if temperature is between 0 and 99
         data['temperature'] = f"0{data['temperature']}"
