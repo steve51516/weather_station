@@ -11,9 +11,7 @@ if __name__=="__main__":
     db.make_table()
     data = {}
     for item in config['sensors']:
-        print(item)
         if config['sensors'].getboolean(item) is False:
-            print(item)
             data[item] = "..."
     while True:
         tmp = sensor.get_data()
@@ -31,4 +29,4 @@ if __name__=="__main__":
         else:
             print(aprs.send_data(data, config))
         show_air_values(config)
-        time.sleep(300)
+        time.sleep(10)
