@@ -2,11 +2,14 @@ import sqlite3
 from datetime import datetime
 from logger import log
 
+connect_mes = "Successfully Connected to SQLite database wxdata.db"
+insert_mes = "Record inserted successfully into weather table"
+
 def make_table():
     try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        log("Successfully Connected to SQLite")
+        log(connect_mes)
         #sqlite_insert_query = """ DROP TABLE IF EXISTS weather; """
         #cursor.execute(sqlite_insert_query)
         sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
@@ -43,13 +46,13 @@ def read_save(data):
   try:
       sqliteConnection = sqlite3.connect('wxdata.db')
       cursor = sqliteConnection.cursor()
-      log("Successfully Connected to SQLite", level="debug")
-      sqlite_insert_query = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
+      log(connect_mes, level="debug")
+      weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
       VALUES(?, ?, ?, ?, ?, ?, ?);"""
       data_tuple = (datetime.now(), data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
-      cursor.execute(sqlite_insert_query, data_tuple)
+      cursor.execute(weather_insert, data_tuple)
       sqliteConnection.commit()
-      log(f"Record inserted successfully into weather table {cursor.rowcount}", level="debug")
+      log(f"{insert_mes} {cursor.rowcount}", level="debug")
       cursor.close()
   except sqlite3.Error as error:
           log(f"Failed to insert data into sqlite table: {error}", level="critical")
