@@ -1,5 +1,5 @@
 from os import read
-import serial, time, parse_config
+import serial, time
 
 def read_sds011(config):
     with serial.Serial() as ser:

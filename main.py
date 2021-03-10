@@ -1,5 +1,5 @@
 from bme280pi import Sensor
-from sds011 import *
+from sds011 import read_sds011, show_air_values
 import time, aprs, db, configparser
 
 
