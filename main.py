@@ -7,7 +7,7 @@ import time, aprs, db, configparser
 if __name__=="__main__":
     config = configparser.ConfigParser()
     config.read('wxconf.ini')
-    sensor = Sensor(0x77)
+    sensor = Sensor(config['bme280']['device'])
     db.make_table()
     data = {}
     data['callsign'] = config['aprs']['callsign']
