@@ -1,5 +1,5 @@
 from os import read
-import serial, time, parse_config
+import serial, time, configparser
 
 def read_sds011(config):
     with serial.Serial() as ser:
@@ -27,6 +27,8 @@ def show_air_values(config):
     print("PM10, µg/m3: ", pm10)
 
 if __name__=="__main__":
+    config = configparser.ConfigParser()
+    config.read('wxconf.ini')
     while True:
-        show_air_values(parse_config.get_config())
+        show_air_values(config)
         time.sleep(10)
