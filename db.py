@@ -10,8 +10,6 @@ def make_table():
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
         log(connect_mes)
-        #sqlite_insert_query = """ DROP TABLE IF EXISTS weather; """
-        #cursor.execute(sqlite_insert_query)
         sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
                                     ID INTEGER PRIMARY KEY,
                                     SampleDateTime TEXT NOT NULL,
@@ -26,7 +24,8 @@ def make_table():
         sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
                                     ID INTEGER PRIMARY KEY,
                                     SampleDateTime TEXT NOT NULL,
-                                    packet TEXT
+                                    packet TEXT,
+                                    Sent INTEGER
                                 );"""
         cursor.execute(sqlite_insert_query1)
         sqliteConnection.commit()

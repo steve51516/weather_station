@@ -1,6 +1,7 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 import time, aprs, db, configparser
+from logger import log
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -24,8 +25,8 @@ if __name__=="__main__":
         data['pm10'] = pm10
         db.read_save(data)
         if config.getboolean('aprs', 'sendall'):
-            print(aprs.send_data(data, config, sendall=True))
+            log(aprs.send_data(data, config, sendall=True))
         else:
-            print(aprs.send_data(data, config))
+            log(aprs.send_data(data, config))
         show_air_values(config)
         time.sleep(10)
