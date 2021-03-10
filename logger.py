@@ -1,7 +1,7 @@
 import logging
 from systemd.journal import JournaldLogHandler
 
-def log(message, level):
+def log(message, level="info"):
     # get an instance of the logger object this module will use
     logger = logging.getLogger(__name__)
     # instantiate the JournaldLogHandler to hook into systemd
@@ -18,3 +18,5 @@ def log(message, level):
         logger.error(message)
     elif level == "warn":
         logging.warn(message)
+    elif level == "critical":
+        logging.critical(message)
