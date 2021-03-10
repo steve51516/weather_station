@@ -30,7 +30,7 @@ def send_data(data, config, sendall=False):
     #   data['humidity'] = int(data['humidity']) 
     packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{data['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{data['wdir']}/{data['avgwind']}g{data['peakwind']}t{data['temperature']}r{data['rain1h']}p{data['rain24h']}b{data['pressure']}h{data['humidity']}"
     if sendall:
-        AIS = aprslib.IS(config['aprs']['callsign'], passwd="-1", host="cwop.aprs.net", port=14580)
+        AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['aprs']['server_pool'], config['aprs']['port'])
         AIS.connect()
         AIS.sendall(packet)
         AIS.close()
