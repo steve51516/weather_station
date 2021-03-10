@@ -3,7 +3,7 @@ from systemd.journal import JournaldLogHandler
 
 config = configparser.ConfigParser()
 config.read('wxconf.ini')
-log_level = config['log_level']
+log_level = config['DEFAULT']['log_level']
 def log(message, level="info"):
     # get an instance of the logger object this module will use
     logger = logging.getLogger(__name__)
