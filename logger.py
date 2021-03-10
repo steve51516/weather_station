@@ -7,9 +7,7 @@ def log(message, level):
     # instantiate the JournaldLogHandler to hook into systemd
     journald_handler = JournaldLogHandler()
     # set a formatter to include the level name
-    journald_handler.setFormatter(logging.Formatter(
-        '[%(levelname)s] %(message)s'
-    ))
+    journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
     # add the journald handler to the current logger
     logger.addHandler(journald_handler)
     if level == "info":
