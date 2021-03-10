@@ -9,7 +9,7 @@ def make_table():
         log("Successfully Connected to SQLite")
         #sqlite_insert_query = """ DROP TABLE IF EXISTS weather; """
         #cursor.execute(sqlite_insert_query)
-        sqlite_insert_query = """ CREATE TABLE IF NOT EXISTS weather(
+        sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
                                     ID INTEGER PRIMARY KEY,
                                     SampleDateTime TEXT NOT NULL,
                                     StationID TEXT,
@@ -18,9 +18,16 @@ def make_table():
                                     Humidity NUMERIC NOT NULL,
                                     PM25 NUMERIC,
                                     PM10 NUMERIC,
-                                AQI
+                                    AQI
                                 );"""
-        cursor.execute(sqlite_insert_query)
+        sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
+                                    ID INTEGER PRIMARY KEY,
+                                    SampleDateTime TEXT NOT NULL,
+                                    packet TEXT
+                                );"""
+        cursor.execute(sqlite_insert_query1)
+        sqliteConnection.commit()
+        cursor.execute(sqlite_insert_query2)
         sqliteConnection.commit()
         log(f"Weather table successfully created {cursor.rowcount}", level="debug")                                                                        
     except sqlite3.Error as error:
