@@ -1,7 +1,7 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
+from sys import stdout
 import time, aprs, db, configparser
-from logger import log
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -23,14 +23,16 @@ if __name__=="__main__":
         pm25,pm10 = read_sds011(config)
         data['pm25'] = pm25
         data['pm10'] = pm10
+        print(data['packet'])
         if config.getboolean('aprs', 'sendall'):
             data['packet'] = aprs.send_data(data, config, sendall=True)
             data['sent'] = 1
-            log(data['packet'])
+            print(f"Packet sent to {config['aprs']['server_pool']}")
         else:
             data['packet'] = aprs.send_data(data, config)
             data['sent'] = 0
-            log(data['packet'])
+        print(data['packet'])
         #show_air_values(config)
         db.read_save_enviro(data); db.read_save_packet(data)
+        stdout.flush()
         time.sleep(10)
