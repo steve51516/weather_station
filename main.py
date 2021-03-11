@@ -31,6 +31,6 @@ if __name__=="__main__":
             data['packet'] = aprs.send_data(data, config)
             data['sent'] = 0
             log(data['packet'])
-        show_air_values(config)
-        db.read_save(data)
+        #show_air_values(config)
+        db.read_save_enviro(data); db.read_save_packet(data)
         time.sleep(10)
