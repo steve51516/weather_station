@@ -23,10 +23,14 @@ if __name__=="__main__":
         pm25,pm10 = read_sds011(config)
         data['pm25'] = pm25
         data['pm10'] = pm10
-        db.read_save(data)
         if config.getboolean('aprs', 'sendall'):
-            log(aprs.send_data(data, config, sendall=True))
+            data['packet'] = aprs.send_data(data, config, sendall=True)
+            data['sent'] = 1
+            log(data['packet'])
         else:
-            log(aprs.send_data(data, config))
+            data['packet'] = aprs.send_data(data, config)
+            data['sent'] = 0
+            log(data['packet'])
         show_air_values(config)
+        db.read_save(data)
         time.sleep(10)
