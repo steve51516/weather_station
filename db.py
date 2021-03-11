@@ -24,8 +24,8 @@ def make_table():
         sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
                                     ID INTEGER PRIMARY KEY,
                                     SampleDate TEXT NOT NULL,
-                                    packet TEXT,
-                                    Sent INTEGER
+                                    packet TEXT NOT NULL,
+                                    Sent INTEGER NOT NULL
                                 );"""
         cursor.execute(sqlite_insert_query1)
         sqliteConnection.commit()
@@ -43,19 +43,19 @@ def make_table():
 
 def read_save(data):
   try:
-      dt,d = datetime.now(), datetime.date()
+      now = datetime.now()
       sqliteConnection = sqlite3.connect('wxdata.db')
       cursor = sqliteConnection.cursor()
       log(connect_mes, level="debug")
       weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
       VALUES(?, ?, ?, ?, ?, ?, ?);"""
-      data_tuple = (dt, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+      data_tuple = (now, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
       cursor.execute(weather_insert, data_tuple)
       sqliteConnection.commit()
       log(f"{insert_mes} weather table {cursor.rowcount}", level="debug")
-      packet_insert = """INSERT INTO weather(SampleDate, packet, Sent) 
+      packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
       VALUES(?, ?, ?);"""
-      data_tuple = (d, data['packet'], data['sent'])
+      data_tuple = (now.date(), data['packet'], data['sent'])
       cursor.execute(packet_insert, data_tuple)
       sqliteConnection.commit()
       log(f"{insert_mes} packet table {cursor.rowcount}", level="debug")
