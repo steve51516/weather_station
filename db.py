@@ -40,7 +40,6 @@ def make_table():
                 sqliteConnection.close()
                 log("The SQLite connection is closed", level="debug")
 
-
 def read_save_enviro(data):
   try:
         now = datetime.now()
