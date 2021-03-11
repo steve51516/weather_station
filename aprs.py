@@ -1,5 +1,4 @@
 import aprslib
-from logger import log
 from bme280pi import Sensor
 
 # The first four fields (wind direction, wind speed, temperature and gust) are required,
