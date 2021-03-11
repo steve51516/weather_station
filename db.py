@@ -1,82 +1,82 @@
 import sqlite3
 from datetime import date, datetime, time
-from logger import log
 
 connect_mes = "Successfully Connected to SQLite database wxdata.db"
+close_mes = "The SQLite connection is closed"
 insert_mes = "Record inserted successfully into"
 
 def make_table():
+    sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
+                                ID INTEGER PRIMARY KEY,
+                                SampleDateTime TEXT NOT NULL,
+                                StationID TEXT,
+                                TemperatureF NUMERIC NOT NULL,
+                                Pressure NUMERIC NOT NULL,
+                                Humidity NUMERIC NOT NULL,
+                                PM25 NUMERIC,
+                                PM10 NUMERIC,
+                                AQI
+                            );"""
+    sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
+                                ID INTEGER PRIMARY KEY,
+                                SampleDate TEXT NOT NULL,
+                                packet TEXT NOT NULL,
+                                Sent INTEGER NOT NULL
+                            );"""
     try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        log(connect_mes)
-        sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
-                                    ID INTEGER PRIMARY KEY,
-                                    SampleDateTime TEXT NOT NULL,
-                                    StationID TEXT,
-                                    TemperatureF NUMERIC NOT NULL,
-                                    Pressure NUMERIC NOT NULL,
-                                    Humidity NUMERIC NOT NULL,
-                                    PM25 NUMERIC,
-                                    PM10 NUMERIC,
-                                    AQI
-                                );"""
-        sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
-                                    ID INTEGER PRIMARY KEY,
-                                    SampleDate TEXT NOT NULL,
-                                    packet TEXT NOT NULL,
-                                    Sent INTEGER NOT NULL
-                                );"""
+        print(connect_mes)
         cursor.execute(sqlite_insert_query1)
+        print(f"weather table successfully created {cursor.rowcount}")                                                                        
         sqliteConnection.commit()
         cursor.execute(sqlite_insert_query2)
         sqliteConnection.commit()
-        log(f"Weather table successfully created {cursor.rowcount}", level="debug")                                                                        
+        print(f"packets table successfully created {cursor.rowcount}")                                                                        
     except sqlite3.Error as error:
-            log(f"Failed to create weather table: {error}", level="critical")
-            print("Failed to create weather table ", error)
+            print(f"CRITICAL: Failed to create weather table: {error}")
     finally:
             if (sqliteConnection):
                 sqliteConnection.close()
-                log("The SQLite connection is closed", level="debug")
+               # print("The SQLite connection is closed")
 
 def read_save_enviro(data):
   try:
         now = datetime.now()
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        log(connect_mes, level="debug")
+        #print(connect_mes)
         weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?);"""
         data_tuple = (now, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
-        log(f"{insert_mes} packet table {cursor.rowcount}", level="debug")
+        print(f"{insert_mes} packet table {cursor.rowcount}")
         cursor.close()
   except sqlite3.Error as error:
-        log(f"Failed to insert data into sqlite weather table: {error}", level="critical")
+        print(f"CRITICAL: Failed to insert data into sqlite weather table: {error}")
   finally:
         if (sqliteConnection):
             sqliteConnection.close()
-            log("The SQLite connection is closed", level="debug")
+            #print("The SQLite connection is closed")
 
 def read_save_packet(data):
     try:
         now = datetime.now()
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        log(connect_mes, level="debug")
+        #print(connect_mes)
         packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
         VALUES(?, ?, ?);"""
         data_tuple = (now.date(), data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
         sqliteConnection.commit()
-        log(f"{insert_mes} packet table {cursor.rowcount}", level="debug")
+        print(f"{insert_mes} packet table {cursor.rowcount}")
         cursor.close()
 
     except sqlite3.Error as error:
-          log(f"Failed to insert data into sqlite packets table: {error}", level="critical")
+          print(f"CRITICAL: Failed to insert data into sqlite packets table: {error}")
     finally:
         if (sqliteConnection):
           sqliteConnection.close()
-          log("The SQLite connection is closed", level="debug")
+          #print(close_mes)
