@@ -2,8 +2,8 @@ import logging, configparser
 from systemd.journal import JournaldLogHandler
 
 config = configparser.ConfigParser()
-config.read('wxconf.ini')
-log_level = config['bme280']['log_level']
+# config.read('wxconf.ini')
+# log_level = config['bme280']['log_level']
 def log(message, level="info"):
     # get an instance of the logger object this module will use
     logger = logging.getLogger(__name__)
@@ -13,13 +13,13 @@ def log(message, level="info"):
     journald_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
     # add the journald handler to the current logger
     logger.addHandler(journald_handler)
-    if level == "info" and log_level == "info":
+    if level == "info":
         logger.info(message)
-    elif level == "debug" and log_level == "debug":
+    elif level == "debug":
         logger.debug(message)
-    elif level == "error" and log_level == "error":
+    elif level == "error":
         logger.error(message)
-    elif level == "warn" and log_level == "warn":
+    elif level == "warn":
         logging.warn(message)
-    elif level == "critical" and log_level == "critical":
+    elif level == "critical":
         logging.critical(message)
