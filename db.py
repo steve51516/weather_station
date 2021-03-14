@@ -28,11 +28,11 @@ def make_table():
         cursor = sqliteConnection.cursor()
         print(connect_mes)
         cursor.execute(sqlite_insert_query1)
-        print(f"weather table successfully created {cursor.rowcount}")                                                                        
+        print(f"weather table successfully created")                                                                        
         sqliteConnection.commit()
         cursor.execute(sqlite_insert_query2)
         sqliteConnection.commit()
-        print(f"packets table successfully created {cursor.rowcount}")                                                                        
+        print(f"{cursor.rowcount} packets table successfully created")                                                                        
     except sqlite3.Error as error:
             print(f"CRITICAL: Failed to create weather table: {error}")
     finally:
@@ -51,7 +51,7 @@ def read_save_enviro(data):
         data_tuple = (now, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
-        print(f"{insert_mes} packet table {cursor.rowcount}")
+        print(f"{cursor.rowcount} {insert_mes} weather table")
         cursor.close()
   except sqlite3.Error as error:
         print(f"CRITICAL: Failed to insert data into sqlite weather table: {error}")
@@ -71,7 +71,7 @@ def read_save_packet(data):
         data_tuple = (now.date(), data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
         sqliteConnection.commit()
-        print(f"{insert_mes} packet table {cursor.rowcount}")
+        print(f"{cursor.rowcount} {insert_mes} packet table")
         cursor.close()
 
     except sqlite3.Error as error:

@@ -23,7 +23,6 @@ if __name__=="__main__":
         pm25,pm10 = read_sds011(config)
         data['pm25'] = pm25
         data['pm10'] = pm10
-        print(data['packet'])
         if config.getboolean('aprs', 'sendall'):
             data['packet'] = aprs.send_data(data, config, sendall=True)
             data['sent'] = 1
