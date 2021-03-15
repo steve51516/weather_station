@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=simple
 User=wxstation
-WorkingDirectory=/home/wxstation/bin
-Environment=PYTHONPATH=/home/wxstation/bin
-ExecStart=/usr/bin/python3 -u /home/wxstation/bin/main.py
+WorkingDirectory=/opt/wxstation/bin
+Environment=PYTHONPATH=/opt/wxstation/bin
+ExecStart=/usr/bin/python3 -u /opt/wxstation/bin/main.py
 Restart=on-failure
 
 [Install]
