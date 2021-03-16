@@ -51,7 +51,7 @@ def read_save_enviro(data):
         data_tuple = (now, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
-        print(f"{cursor.rowcount} {insert_mes} weather table")
+        print(f"{cursor.rowcount} {insert_mes} weather table,", end=" ")
         cursor.close()
   except sqlite3.Error as error:
         print(f"CRITICAL: Failed to insert data into sqlite weather table: {error}")
