@@ -35,6 +35,6 @@ if __name__=="__main__":
         if bool(config['database']['sqlite']) == True:
             db.read_save_enviro(data); db.read_save_packet(data)
         if bool(config['database']['sqlite']) == True:
-            mariadb.read_save_sensors(data); mariadb.read_save_packet(data)
+            mdb.read_save_sensors(data); mdb.read_save_packet(data)
         stdout.flush()
         time.sleep(10)
