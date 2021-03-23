@@ -1,7 +1,7 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 from sys import stdout
-import time, aprs, db, configparser
+import time, aprs, db, configparser, mdb
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -32,6 +32,9 @@ if __name__=="__main__":
             data['sent'] = 0
         print(data['packet'])
         #show_air_values(config)
-        db.read_save_enviro(data); db.read_save_packet(data)
+        if bool(config['database']['sqlite']) == True:
+            db.read_save_enviro(data); db.read_save_packet(data)
+        if bool(config['database']['sqlite']) == True:
+            mariadb.read_save_sensors(data); mariadb.read_save_packet(data)
         stdout.flush()
         time.sleep(10)
