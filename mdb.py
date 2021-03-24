@@ -14,8 +14,7 @@ def create_db():
                 PM25 FLOAT,
                 PM10 FLOAT
                 );"""
-    packet_table_init = """ USE packet;
-                            CREATE TABLE IF NOT EXISTS packets(
+    packet_table_init = """ CREATE TABLE IF NOT EXISTS packets(
                             ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                             SampleTimeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
                             packet VARCHAR(100) NOT NULL,
