@@ -20,9 +20,13 @@ if __name__=="__main__":
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
         data['ztime'] = time.strftime('%H%M%S', time.gmtime())
-        pm25,pm10 = read_sds011(config)
-        data['pm25'] = pm25
-        data['pm10'] = pm10
+        if config['serial'].getboolean('enabled') is True:
+            pm25,pm10 = read_sds011(config)
+            data['pm25'] = pm25
+            data['pm10'] = pm10
+        else:
+            data['pm25'] = 0
+            data['pm10'] = 0
         if config.getboolean('aprs', 'sendall'):
             data['packet'] = aprs.send_data(data, config, sendall=True)
             data['sent'] = 1
@@ -30,8 +34,9 @@ if __name__=="__main__":
         else:
             data['packet'] = aprs.send_data(data, config)
             data['sent'] = 0
-        print(data['packet'])
-        #show_air_values(config)
+        if config['sensors'].getboolean('quite') is False:
+            print(data['packet'])
+            show_air_values(config)
         db.read_save_enviro(data); db.read_save_packet(data)
         stdout.flush()
         time.sleep(10)
