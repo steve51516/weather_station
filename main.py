@@ -34,7 +34,7 @@ if __name__=="__main__":
         else:
             data['packet'] = aprs.send_data(data, config)
             data['sent'] = 0
-        if config['sensors'].getboolean('quite') is False:
+        if config['sensors'].getboolean('quiet') is False:
             print(data['packet'])
             show_air_values(config)
         db.read_save_enviro(data); db.read_save_packet(data)
