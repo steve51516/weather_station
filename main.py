@@ -37,6 +37,6 @@ if __name__=="__main__":
         if config['sensors'].getboolean('quiet') is False:
             print(data['packet'])
             show_air_values(config)
-        db.read_save_enviro(data); db.read_save_packet(data)
+        db.read_save_enviro(data); db.read_save_packet(data) # Write to database
         stdout.flush()
-        time.sleep(10)
+        time.sleep(300) # Wait 5 minutes
