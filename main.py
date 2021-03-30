@@ -21,7 +21,7 @@ if __name__=="__main__":
                                                 # TODO convert float to 5 digit number without rounding
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
-        data['ztime'] = time.strftime('%H%M%S', time.gmtime()) # Get zulu/UTC time
+        data['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config)
             data['pm25'] = pm25
