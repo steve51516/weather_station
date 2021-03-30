@@ -6,7 +6,7 @@ import time, aprs, db, configparser
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
-    config.read('wxconf.ini')
+    config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
     sensor = Sensor(0x77)
     db.make_table()
