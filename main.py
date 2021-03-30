@@ -1,11 +1,12 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 from sys import stdout
+from math import trunc
 import time, aprs, db, configparser
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
-    config.read('wxconf.ini')
+    config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
     sensor = Sensor(0x77)
     db.make_table()
@@ -16,12 +17,10 @@ if __name__=="__main__":
             data[item] = "..."
     while True:
         tmp = sensor.get_data()
-        #data['pressure'] = round(tmp['pressure'], 1)
-        data['pressure'] = int(tmp['pressure']) # Temp fix to remove decimal point from pressure. Zero is appended in packet string to make 5 digits
-                                                # TODO convert float to 5 digit number without rounding
+        data['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
-        data['ztime'] = time.strftime('%H%M%S', time.gmtime()) # Get zulu/UTC time
+        data['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config)
             data['pm25'] = pm25

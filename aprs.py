@@ -27,8 +27,8 @@ def send_data(data, config, sendall=False):
     if data['humidity'] == 100:
         data['humidity'] = "00"
 
-    #   data['humidity'] = int(data['humidity']) 
-    packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{data['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{data['wdir']}/{data['avgwind']}g{data['peakwind']}t{data['temperature']}r{data['rain1h']}p{data['rain24h']}b{data['pressure']}0h{data['humidity']}" # TODO convert float to 5 digit number without rounding
+    #   data['humidity'] = int(data['humidity'])
+    packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{data['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{data['wdir']}/{data['avgwind']}g{data['peakwind']}t{data['temperature']}r{data['rain1h']}p{data['rain24h']}P{data['rain00m']}b{data['pressure']}h{data['humidity']}{config['aprs']['comment']}"
     if sendall:
         AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['aprs']['server_pool'], config['aprs']['port'])
         AIS.connect()
