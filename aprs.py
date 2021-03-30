@@ -32,7 +32,7 @@ def send_data(data, config, sendall=False):
         {data['ztime']}z{config['aprs']['longitude']}/\
             {config['aprs']['latitude']}_{data['wdir']}/\
                 {data['avgwind']}g{data['peakwind']}t{data['temperature']}r\
-                    {data['rain1h']}p{data['rain24h']}b{data['pressure']}0h{data['humidity']}" # TODO convert float to 5 digit number without rounding
+                    {data['rain1h']}p{data['rain24h']}P{data['rain00m']}b{data['pressure']}0h{data['humidity']}"
     if sendall:
         AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['aprs']['server_pool'], config['aprs']['port'])
         AIS.connect()
