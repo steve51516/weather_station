@@ -17,7 +17,8 @@ if __name__=="__main__":
     while True:
         tmp = sensor.get_data()
         #data['pressure'] = round(tmp['pressure'], 1)
-        data['pressure'] = int(tmp['pressure'])
+        data['pressure'] = int(tmp['pressure']) # Temp fix to remove decimal point from pressure. Zero is appended in packet string to make 5 digits
+                                                # TODO convert float to 5 digit number without rounding
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
         data['ztime'] = time.strftime('%H%M%S', time.gmtime()) # Get zulu/UTC time
