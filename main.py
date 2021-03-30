@@ -12,15 +12,16 @@ if __name__=="__main__":
     data = {}
     data['callsign'] = config['aprs']['callsign']
     for item in config['sensors']:
-        if config['sensors'].getboolean(item) is False:
+        if config['sensors'].getboolean(item) is False: # If an item in config is boolean false assign value of "..."
             data[item] = "..."
     while True:
         tmp = sensor.get_data()
-        data['pressure'] = round(tmp['pressure'], 1)
+        #data['pressure'] = round(tmp['pressure'], 1)
+        data['pressure'] = int(tmp['pressure'])
         data['humidity'] = int(tmp['humidity'])
         data['temperature'] = int(sensor.get_temperature(unit='F'))
-        data['ztime'] = time.strftime('%H%M%S', time.gmtime())
-        if config['serial'].getboolean('enabled') is True:
+        data['ztime'] = time.strftime('%H%M%S', time.gmtime()) # Get zulu/UTC time
+        if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config)
             data['pm25'] = pm25
             data['pm10'] = pm10
