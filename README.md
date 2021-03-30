@@ -2,7 +2,7 @@
 	* steve51516@gmail.com
 ## Create a weather station with a Raspberry pi!
 
-Currently I'm using [Raspberry Pi OS lite](https://www.raspberrypi.org/software/operating-systems/) but eventually I plan to make a script to setup an environment for [Arch Linux Arm](https://archlinuxarm.org/).
+Currently developed for [Raspberry Pi OS lite](https://www.raspberrypi.org/software/operating-systems/) 
 
 ### Hardware Components
 1. [Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/) or [Raspberry Pi Zero](https://www.raspberrypi.org/products/raspberry-pi-zero/)
@@ -10,7 +10,7 @@ Currently I'm using [Raspberry Pi OS lite](https://www.raspberrypi.org/software/
 1. Highly recommended [Bingfu Dual Band WiFi 2.4GHz 5GHz 5.8GHz 9dBi Magnetic Base RP-SMA Male Antenna](https://www.amazon.com/dp/B07MG6ZXCD/ref=twister_B08BDG1R51?_encoding=UTF8&psc=1)
 1. [Alfa AWUS036ACS 802.11ac AC600 Wi-Fi Wireless Network Adapter](https://www.alfa.com.tw/products/awus036acs)
 1. [Waveshare BME280 Environmental Sensor, Temperature, Humidity, Barometric Pressure Detection Module I2C/SPI Interface](https://www.amazon.com/gp/product/B07P4CWGGK/ref=ppx_yo_dt_b_asin_title_o04_s00?ie=UTF8&psc=1)
-1. [DollaTek PM Sensor SDS011 High Precision PM2.5 Air Quality Detection Sensor Module Super Dust Sensors Digital Output](https://www.amazon.com/gp/product/B07M6JWCWQ/ref=ppx_yo_dt_b_asin_title_o03_s00?ie=UTF8&psc=1)
+1. Optional for PM2.5 and PM10 readings [DollaTek PM Sensor SDS011 High Precision PM2.5 Air Quality Detection Sensor Module Super Dust Sensors Digital Output](https://www.amazon.com/gp/product/B07M6JWCWQ/ref=ppx_yo_dt_b_asin_title_o03_s00?ie=UTF8&psc=1)
 1. Waterproof electronics box with cable glands, [like this](https://www.amazon.com/dp/B08FT1H2RZ/ref=twister_B08GG2HGTB?_encoding=UTF8&psc=1)
 
 ### Optional POE equipment can be used with ethernet adapter
