@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date, datetime, time
+from datetime import datetime
 
 connect_mes = "Successfully Connected to SQLite database wxdata.db"
 close_mes = "The SQLite connection is closed"
@@ -42,13 +42,11 @@ def make_table():
 
 def read_save_enviro(data):
   try:
-        now = datetime.now()
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        #print(connect_mes)
         weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?);"""
-        data_tuple = (now, data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+        data_tuple = (datetime.now(), data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} weather table,", end=" ")
@@ -58,17 +56,14 @@ def read_save_enviro(data):
   finally:
         if (sqliteConnection):
             sqliteConnection.close()
-            #print("The SQLite connection is closed")
 
 def read_save_packet(data):
     try:
-        now = datetime.now()
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        #print(connect_mes)
         packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
         VALUES(?, ?, ?);"""
-        data_tuple = (now.date(), data['packet'], data['sent'])
+        data_tuple = (datetime.now(), data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} packet table")
