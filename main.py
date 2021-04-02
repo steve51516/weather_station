@@ -1,7 +1,6 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 from sys import stdout
-from math import trunc
 import time, aprs, db, configparser
 
 if __name__=="__main__":
@@ -12,15 +11,11 @@ if __name__=="__main__":
     db.make_table()
     data = {}
     data['callsign'] = config['aprs']['callsign']
-    for item in config['sensors']:
-        if config['sensors'].getboolean(item) is False: # If an item in config is boolean false assign value of "..."
-            data[item] = "..."
+    for item in config['sensors']: # If an item in config is boolean false assign value of "..."
+        if config['sensors'].getboolean(item) is False: data[item] = "..."
     while True:
-        tmp = sensor.get_data()
-        data['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
-        data['humidity'] = int(tmp['humidity'])
+        data += sensor.get_data()
         data['temperature'] = int(sensor.get_temperature(unit='F'))
-        data['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config)
             data['pm25'] = pm25
