@@ -3,7 +3,7 @@ from sds011 import read_sds011, show_air_values
 from sys import stdout
 import time, aprs, db, configparser
 
-if __name__=="__main__":
+def init():
     config = configparser.ConfigParser()
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
@@ -12,6 +12,10 @@ if __name__=="__main__":
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
+    return (config,data,sensor)
+
+if __name__=="__main__":
+    (config,data,sensor) = init()
     while True:
         data += sensor.get_data()
         data['temperature'] = int(sensor.get_temperature(unit='F'))
