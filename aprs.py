@@ -12,7 +12,6 @@ def send_data(data, config, sendall=False):
     elif data['temperature'] < -9:
         data['temperature'] = f"0{data['temperature']}"
 
-    data['pressure'] = round(data['pressure'], 1) # The letter "b" followed by 5 numbers represents the barometric pressure in tenths of a millibar.
     if data['humidity'] == 100:
         data['humidity'] = "00"
     
@@ -20,9 +19,10 @@ def send_data(data, config, sendall=False):
 
     if sendall:
         for server in config['servers']:
-            AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
+            AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config[server], config['aprs']['port'])
             AIS.connect()
             AIS.sendall(packet)
             AIS.close()
+            print(f"Packet sent to {config[server]}")
 
     return packet

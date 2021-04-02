@@ -31,7 +31,6 @@ if __name__=="__main__":
         if config.getboolean('aprs', 'sendall'):
             data['packet'] = aprs.send_data(data, config, sendall=True)
             data['sent'] = 1
-            print(f"Packet sent to {config['aprs']['server_pool']}")
         else:
             data['packet'] = aprs.send_data(data, config)
             data['sent'] = 0
