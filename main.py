@@ -16,7 +16,7 @@ if __name__=="__main__":
     while True:
         tmp = sensor.get_data()
         data['temperature'] = sensor.get_temperature(unit='F')
-        data['pressure'] = tmp['pressure'] # shift decimal point to the left 1 and round
+        data['pressure'] = tmp['pressure']
         data['humidity'] = tmp['humidity']
         data['temperature'] = sensor.get_temperature(unit='F')
 
@@ -26,6 +26,8 @@ if __name__=="__main__":
         else:
             data['pm25'], data['pm10'] = 0, 0
 
+        db.read_save_enviro(data)
+        
         if config.getboolean('aprs', 'sendall'):
             data['sent'], data['packet'] = 1, aprs.send_data(data, config, sendall=True)
         else:
@@ -35,5 +37,5 @@ if __name__=="__main__":
             print(data['packet'])
             show_air_values(config)
 
-        db.read_save_enviro(data); db.read_save_packet(data) # Write to database
+        db.read_save_packet(data) # Write to database
         stdout.flush(); time.sleep(300) # Wait 5 minutes
