@@ -3,7 +3,7 @@ from sds011 import read_sds011, show_air_values
 from sys import stdout
 import time, aprs, db, configparser
 
-def init():
+if __name__=="__main__":
     config = configparser.ConfigParser()
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
@@ -12,13 +12,13 @@ def init():
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
-    return (config,data,sensor)
-
-if __name__=="__main__":
-    (config,data,sensor) = init()
+        
     while True:
-        data += sensor.get_data()
-        data['temperature'] = int(sensor.get_temperature(unit='F'))
+        tmp = sensor.get_data()
+        data['temperature'] = sensor.get_temperature(unit='F')
+        data['pressure'] = tmp['pressure'] # shift decimal point to the left 1 and round
+        data['humidity'] = tmp['humidity']
+        data['temperature'] = sensor.get_temperature(unit='F')
 
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config)
