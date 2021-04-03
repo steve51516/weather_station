@@ -26,10 +26,10 @@ def send_data(data, config, sendall=False):
     packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{data['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{data['wdir']}/{data['avgwind']}g{data['peakwind']}t{data['temperature']}r{data['rain1h']}p{data['rain24h']}P{data['rain00m']}b{data['pressure']}h{data['humidity']}{config['aprs']['comment']}"
     if sendall:
         for server in config['servers']:
-            AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config[server], config['aprs']['port'])
+            AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
             AIS.connect()
             AIS.sendall(packet)
             AIS.close()
-            print(f"Packet sent to {config[server]}")
+            print(f"Packet sent to {config['servers'][server]}")
 
     return packet
