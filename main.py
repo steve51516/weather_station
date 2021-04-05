@@ -18,9 +18,10 @@ if __name__=="__main__":
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
+    th_rain = th.Thread(target=monitor_rainfall, daemon=True)
+    th_rain.start()
         
     while True:
-        th_rain = th.Thread(target=monitor_rainfall, daemon=True)
         tmp = sensor.get_data()
         data['temperature'] = sensor.get_temperature(unit='F')
         data['pressure'] = tmp['pressure']
@@ -38,7 +39,6 @@ if __name__=="__main__":
 
         db.read_save_packet(data) # Write to packet table
         print(data['packet'])
-        th_rain.start()
         if th_rain.is_alive() is False:
             print("ERROR: tipping bucket sensor is not working")
         stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
