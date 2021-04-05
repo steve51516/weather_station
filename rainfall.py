@@ -16,9 +16,8 @@ def reset_rainfall():
     global tips
     tips = 0
 
-def monitor_rainfall(seconds):
-    for i in range(1, seconds * 10):
+def monitor_rainfall():
+    while True:
         if bucket.is_active:
             bucket_tipped()
         sleep(0.1)
-    reset_rainfall()
