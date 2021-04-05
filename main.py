@@ -18,7 +18,7 @@ if __name__=="__main__":
         data['temperature'] = sensor.get_temperature(unit='F')
         data['pressure'] = tmp['pressure']
         data['humidity'] = tmp['humidity']
-        data['temperature'] = sensor.get_temperature(unit='F')
+        tmp.clear()
 
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
             pm25,pm10 = read_sds011(config) # Get readings from sds011
