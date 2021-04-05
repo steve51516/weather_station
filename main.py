@@ -21,12 +21,12 @@ if __name__=="__main__":
         data['temperature'] = sensor.get_temperature(unit='F')
 
         if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
-            pm25,pm10 = read_sds011(config)
-            data['pm25'], data['pm10'] = pm25, pm10
+            pm25,pm10 = read_sds011(config) # Get readings from sds011
+            data['pm25'], data['pm10'] = pm25, pm10 # Assign true readings
         else:
-            data['pm25'], data['pm10'] = 0, 0
+            data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
 
-        db.read_save_enviro(data)
+        db.read_save_enviro(data) # Write to weather table before values get rounded
         
         if config.getboolean('aprs', 'sendall'):
             data['sent'], data['packet'] = 1, aprs.send_data(data, config, sendall=True)
@@ -37,5 +37,5 @@ if __name__=="__main__":
             print(data['packet'])
             show_air_values(config)
 
-        db.read_save_packet(data) # Write to database
-        stdout.flush(); time.sleep(300) # Wait 5 minutes
+        db.read_save_packet(data) # Write to packet table
+        stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
