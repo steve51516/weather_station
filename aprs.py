@@ -5,6 +5,7 @@ from math import trunc
 def format_data(data, config):
         tmp = data # Create copy so that original data dictionary is not modified
         tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
+        tmp['temperature'] = int(data['temperature'])
         tmp['humidity'] = int(tmp['humidity'])
         tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         # Temperature must be 3 digits
@@ -44,6 +45,5 @@ def send_data(data, config):
             print(f"Packet sent to {config['servers'][server]}")
             sent = 1
     else:
-        sent = 0            
-
+        sent = 0
     return sent,packet
