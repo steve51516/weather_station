@@ -27,11 +27,7 @@ if __name__=="__main__":
             data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
 
         db.read_save_enviro(data) # Write to weather table before values get rounded
-        
-        if config.getboolean('aprs', 'sendall'):
-            data['sent'], data['packet'] = 1, aprs.send_data(data, config, sendall=True)
-        else:
-            data['sent'], data['packet'] = 0, aprs.send_data(data, config)
+        data['sent'], data['packet'] = aprs.send_data(data, config)
 
         if config['sensors'].getboolean('quiet') is False:
             print(data['packet'])

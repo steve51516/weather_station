@@ -23,9 +23,9 @@ def format_data(data, config):
 
         return packet
         
-def send_data(data, config, sendall=False):
+def send_data(data, config):
     packet = format_data(data, config)
-    if sendall:
+    if config.getboolean('aprs', 'sendall'):
         for server in config['servers']:
             for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
                 delay = i * 10
@@ -41,5 +41,8 @@ def send_data(data, config, sendall=False):
                 finally:
                     AIS.close()
             print(f"Packet sent to {config['servers'][server]}")
+            sent = 1
+    else:
+        sent = 0            
 
-    return packet
+    return sent,packet
