@@ -29,9 +29,8 @@ if __name__=="__main__":
         db.read_save_enviro(data) # Write to weather table before values get rounded
         data['sent'], data['packet'] = aprs.send_data(data, config)
 
+        db.read_save_packet(data) # Write to packet table
         if config['sensors'].getboolean('quiet') is False:
             print(data['packet'])
             show_air_values(config)
-
-        db.read_save_packet(data) # Write to packet table
         stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes

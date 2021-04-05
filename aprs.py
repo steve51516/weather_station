@@ -3,24 +3,25 @@ from bme280pi import Sensor
 from math import trunc
 
 def format_data(data, config):
-        data['pressure'] = trunc(round(data['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
-        data['humidity'] = int(data['humidity'])
-        data['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
+        tmp = data # Create copy so that original data dictionary is not modified
+        tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
+        tmp['humidity'] = int(tmp['humidity'])
+        tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         # Temperature must be 3 digits
-        if data['temperature'] < 100 and data['temperature'] > 9: # Add 0 in front if temperature is between 0 and 99
-            data['temperature'] = f"0{data['temperature']}"
-        elif data['temperature'] > 9 and data['temperature'] >= 0: # add 00 in front if between 0 and 9
-            data['temperature'] = f"00{data['temperature']}"
-        elif data['temperature'] < 0 and data['temperature'] > -9:
-            data['temperature'] = f"00{data['temperature']}"
-        elif data['temperature'] < -9:
-            data['temperature'] = f"0{data['temperature']}"
+        if tmp['temperature'] < 100 and tmp['temperature'] > 9: # Add 0 in front if temperature is between 0 and 99
+            tmp['temperature'] = f"0{tmp['temperature']}"
+        elif tmp['temperature'] > 9 and tmp['temperature'] >= 0: # add 00 in front if between 0 and 9
+            tmp['temperature'] = f"00{tmp['temperature']}"
+        elif tmp['temperature'] < 0 and tmp['temperature'] > -9:
+            tmp['temperature'] = f"00{tmp['temperature']}"
+        elif tmp['temperature'] < -9:
+            tmp['temperature'] = f"0{tmp['temperature']}"
         # Humidity must be 2 digits. If humidity is 100% assign value of 00
-        if data['humidity'] == 100:
-            data['humidity'] = "00"
+        if tmp['humidity'] == 100:
+            tmp['humidity'] = "00"
 
-        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{data['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{data['wdir']}/{data['avgwind']}g{data['peakwind']}t{data['temperature']}r{data['rain1h']}p{data['rain24h']}P{data['rain00m']}b{data['pressure']}h{data['humidity']}{config['aprs']['comment']}"
-
+        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['avgwind']}g{tmp['peakwind']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{tmp['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
+        tmp.clear()
         return packet
         
 def send_data(data, config):
