@@ -27,10 +27,19 @@ def send_data(data, config, sendall=False):
     packet = format_data(data, config)
     if sendall:
         for server in config['servers']:
-            AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
-            AIS.connect()
-            AIS.sendall(packet)
-            AIS.close()
+            for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
+                delay = i * 10
+                AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
+                try:
+                    AIS.connect()
+                    AIS.sendall(packet)
+                except Exception as error:
+                    print(error)
+                    print(f"Retry number: {i}\n Trying again in {delay} seconds...")
+                    time.sleep(delay)
+                    continue
+                finally:
+                    AIS.close()
             print(f"Packet sent to {config['servers'][server]}")
 
     return packet
