@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime
 
 connect_mes = "Successfully Connected to SQLite database wxdata.db"
 close_mes = "The SQLite connection is closed"
@@ -46,7 +45,7 @@ def read_save_enviro(data):
         cursor = sqliteConnection.cursor()
         weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?);"""
-        data_tuple = (datetime.now(), data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+        data_tuple = ("datetime('now')", data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} weather table,", end=" ")
@@ -63,7 +62,7 @@ def read_save_packet(data):
         cursor = sqliteConnection.cursor()
         packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
         VALUES(?, ?, ?);"""
-        data_tuple = (datetime.now(), data['packet'], data['sent'])
+        data_tuple = ("datetime('now')", data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} packet table")
