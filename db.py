@@ -18,7 +18,7 @@ def make_table():
                             );"""
     sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
                                 ID INTEGER PRIMARY KEY,
-                                Date TEXT NOT NULL,
+                                DateTime TEXT NOT NULL,
                                 packet TEXT NOT NULL,
                                 Sent INTEGER NOT NULL
                             );"""
@@ -43,7 +43,7 @@ def read_save_enviro(data):
   try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
+        weather_insert = """INSERT INTO weather(DateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?);"""
         data_tuple = ("datetime('now')", data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
@@ -60,7 +60,7 @@ def read_save_packet(data):
     try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
+        packet_insert = """INSERT INTO packets(DateTime, packet, Sent) 
         VALUES(?, ?, ?);"""
         data_tuple = ("datetime('now')", data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
