@@ -1,7 +1,8 @@
 from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 from sys import stdout
-import time, aprs, db, configparser
+from rainfall import monitor_rainfall
+import time, aprs, db, configparser, threading
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -12,6 +13,9 @@ if __name__=="__main__":
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
+    rain_thread = threading.Thread(target=monitor_rainfall(3000))
+    rain_thread.setName('rain_thread')
+    rain_thread.start()
         
     while True:
         tmp = sensor.get_data()
