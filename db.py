@@ -7,7 +7,7 @@ insert_mes = "Record inserted successfully into"
 def make_table():
     sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
                                 ID INTEGER PRIMARY KEY,
-                                SampleDateTime TEXT NOT NULL,
+                                DateTime TEXT NOT NULL,
                                 StationID TEXT,
                                 TemperatureF NUMERIC NOT NULL,
                                 Pressure NUMERIC NOT NULL,
@@ -18,7 +18,7 @@ def make_table():
                             );"""
     sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
                                 ID INTEGER PRIMARY KEY,
-                                SampleDate TEXT NOT NULL,
+                                Date TEXT NOT NULL,
                                 packet TEXT NOT NULL,
                                 Sent INTEGER NOT NULL
                             );"""
