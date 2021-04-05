@@ -2,7 +2,12 @@ from bme280pi import Sensor
 from sds011 import read_sds011, show_air_values
 from sys import stdout
 from rainfall import monitor_rainfall
-import time, aprs, db, configparser, threading
+import time, aprs, db, configparser, threading as th
+from time import sleep
+
+def kill_monitor():
+    sleep(10)
+    th_rain.exit()
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -13,9 +18,7 @@ if __name__=="__main__":
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
-    rain_thread = threading.Thread(target=monitor_rainfall(3000))
-    rain_thread.setName('rain_thread')
-    rain_thread.start()
+    th_rain = th.Thread(target=monitor_rainfall, daemon=True)
         
     while True:
         tmp = sensor.get_data()
@@ -34,7 +37,8 @@ if __name__=="__main__":
         data['sent'], data['packet'] = aprs.send_data(data, config)
 
         db.read_save_packet(data) # Write to packet table
-        if config['sensors'].getboolean('quiet') is False:
-            print(data['packet'])
-            show_air_values(config)
-        stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
+        print(data['packet'])
+        print("Monitoring rainfall...")
+        th_rain.is_alive()
+        time.time()
+        stdout.flush(); #time.sleep(300) # Flush buffered output and Wait 5 minutes
