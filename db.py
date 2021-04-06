@@ -51,7 +51,7 @@ def db_connect():
             port=3306,
             database="weather"
         )
-        return conn.cursor()
+        return conn
     except db.Error as e:
         print(f"Error connecting to MariaDB Server: {e}")
         sys.exit(1)
