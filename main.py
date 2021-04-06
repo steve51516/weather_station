@@ -30,7 +30,7 @@ if __name__=="__main__":
         else:
             data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
 
-        db.read_save_enviro(data) # Write to weather table before values get rounded
+        db.read_save_sensors(data) # Write to weather table before values get rounded
         data['sent'], data['packet'] = aprs.send_data(data, config)
 
         db.read_save_packet(data) # Write to packet table

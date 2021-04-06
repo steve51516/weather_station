@@ -57,7 +57,7 @@ def db_connect():
         sys.exit(1)
 
 def read_save_sensors(data):
-    weather_insert = """INSERT INTO weather(StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
+    weather_insert = """INSERT INTO weather(stationid, ambient_temperature, wind_direction, wind_speed, wind_gust_speed, humidity, air_pressure, rainfall, pm25, pm10) 
     VALUES(?, ?, ?, ?, ?, ?);"""
     data_tuple = (data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
     conn = db_connect()
