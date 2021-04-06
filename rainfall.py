@@ -21,8 +21,4 @@ def reset_rainfall():
     tips = 0
 
 def monitor_rainfall():
-    stime = int(time.strftime('%M'))
-    while stime < stime + 5:
-        if bucket.is_active:
-            bucket_tipped()
-        time.sleep(0.1)
+    bucket.when_pressed = bucket_tipped
