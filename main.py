@@ -6,7 +6,7 @@ from time import sleep
 from rainfall import *
 
 if __name__=="__main__":
-    global config; config = configparser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
     sensor = Sensor(0x77)
@@ -35,7 +35,7 @@ if __name__=="__main__":
             reset_rainfall() # reset tips variable
 
         db.read_save_sensors(data) # Write to weather table before values get rounded
-        data['sent'], data['packet'] = aprs.send_data(data)
+        data['sent'], data['packet'] = aprs.send_data(data, config)
 
         db.read_save_packet(data) # Write to packet table
         #print(data['packet'])
