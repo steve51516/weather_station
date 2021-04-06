@@ -1,8 +1,9 @@
 import aprslib, time
 from bme280pi import Sensor
 from math import trunc
+from main import config
 
-def format_data(data, config):
+def format_data(data):
         tmp = data # Create copy so that original data dictionary is not modified
         tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
         tmp['temperature'] = int(data['temperature'])
@@ -24,7 +25,7 @@ def format_data(data, config):
         packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['avgwind']}g{tmp['peakwind']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
         return packet
         
-def send_data(data, config):
+def send_data(data):
     packet = format_data(data, config)
     if config.getboolean('aprs', 'sendall'):
         for server in config['servers']:
