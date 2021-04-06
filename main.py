@@ -31,6 +31,7 @@ if __name__=="__main__":
             data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
         if config['sensors'].getboolean('rain1h') is True:
             data['rainfall'] = tips
+            reset_rainfall() # reset tips variable
 
         db.read_save_sensors(data) # Write to weather table before values get rounded
         data['sent'], data['packet'] = aprs.send_data(data, config)
