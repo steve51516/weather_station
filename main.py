@@ -5,10 +5,6 @@ from rainfall import monitor_rainfall
 import time, aprs, db, configparser, threading as th
 from time import sleep
 
-def kill_monitor():
-    sleep(10)
-    th_rain.exit()
-
 if __name__=="__main__":
     config = configparser.ConfigParser()
     config.read('wxstation.conf')
