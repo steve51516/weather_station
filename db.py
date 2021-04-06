@@ -3,8 +3,7 @@ from time import sleep
 
 def create_db():
     db_init = """ CREATE DATABASE IF NOT EXISTS weather;"""
-    weather_table_init = """ USE weather;
-                CREATE TABLE IF NOT EXISTS sensors (
+    weather_table_init = """CREATE TABLE IF NOT EXISTS sensors (
                 ID BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 stationid VARCHAR(10),
                 created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -18,19 +17,19 @@ def create_db():
                 PM25 DECIMAL(6,2),
                 PM10 DECIMAL(6,2)
                 );"""
-    packet_table_init = """ USE weather;
-                            CREATE TABLE IF NOT EXISTS packets(
-                            ID BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                            created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-                            packet VARCHAR(100) NOT NULL,
-                            transmitted BOOL NOT NULL
-                            );"""
+    packet_table_init = """CREATE TABLE IF NOT EXISTS packets(
+                           ID BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                           created TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                           packet VARCHAR(100) NOT NULL,
+                           transmitted BOOL NOT NULL
+                           );"""
 
     try:
         conn = db.connect(
             user="wxstation",
             password="password1",
             host="127.0.0.1",
+            database="weather",
             port=3306
         )
         cur = conn.cursor()
