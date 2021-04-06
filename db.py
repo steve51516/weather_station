@@ -1,5 +1,5 @@
 import mariadb as db
-import sys
+from time import sleep
 
 def create_db():
     db_init = """ CREATE DATABASE IF NOT EXISTS weather;"""
@@ -40,21 +40,25 @@ def create_db():
         conn.close()
     except db.Error as e:
         print(f"Error connecting to MariaDB Server: {e}")
-        sys.exit(1)
+        #sys.exit(1)
 
 def db_connect():
-    try:
-        conn = db.connect(
-            user="wxstation",
-            password="password1",
-            host="127.0.0.1",
-            port=3306,
-            database="weather"
-        )
-        return conn
-    except db.Error as e:
-        print(f"Error connecting to MariaDB Server: {e}")
-        sys.exit(1)
+    for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
+        delay = i * 10
+        try:
+            conn = db.connect(
+                user="wxstation",
+                password="password1",
+                host="127.0.0.1",
+                port=3306,
+                database="weather"
+            )
+            return conn
+        except db.Error as e:
+            print(f"Error connecting to MariaDB Server: {e}\n\t Retry number {i}\n\t Retrying in {delay} seconds...")
+            #sys.exit(1)
+            sleep(delay)
+            continue
 
 def read_save_sensors(data):
     sensors_insert = """INSERT INTO sensors(stationid, ambient_temperature, wind_direction, wind_speed, wind_gust_speed, humidity, air_pressure, rainfall, pm25, pm10) 
