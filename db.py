@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime
 
 connect_mes = "Successfully Connected to SQLite database wxdata.db"
 close_mes = "The SQLite connection is closed"
@@ -8,7 +7,7 @@ insert_mes = "Record inserted successfully into"
 def make_table():
     sqlite_insert_query1 = """ CREATE TABLE IF NOT EXISTS weather(
                                 ID INTEGER PRIMARY KEY,
-                                SampleDateTime TEXT NOT NULL,
+                                DateTime TEXT NOT NULL,
                                 StationID TEXT,
                                 TemperatureF NUMERIC NOT NULL,
                                 Pressure NUMERIC NOT NULL,
@@ -19,7 +18,7 @@ def make_table():
                             );"""
     sqlite_insert_query2 = """ CREATE TABLE IF NOT EXISTS packets(
                                 ID INTEGER PRIMARY KEY,
-                                SampleDate TEXT NOT NULL,
+                                DateTime TEXT NOT NULL,
                                 packet TEXT NOT NULL,
                                 Sent INTEGER NOT NULL
                             );"""
@@ -44,9 +43,9 @@ def read_save_enviro(data):
   try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        weather_insert = """INSERT INTO weather(SampleDateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
+        weather_insert = """INSERT INTO weather(DateTime, StationID, TemperatureF, Pressure, Humidity, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?);"""
-        data_tuple = (datetime.now(), data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+        data_tuple = ("datetime('now')", data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
         cursor.execute(weather_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} weather table,", end=" ")
@@ -61,9 +60,9 @@ def read_save_packet(data):
     try:
         sqliteConnection = sqlite3.connect('wxdata.db')
         cursor = sqliteConnection.cursor()
-        packet_insert = """INSERT INTO packets(SampleDate, packet, Sent) 
+        packet_insert = """INSERT INTO packets(DateTime, packet, Sent) 
         VALUES(?, ?, ?);"""
-        data_tuple = (datetime.now(), data['packet'], data['sent'])
+        data_tuple = ("datetime('now')", data['packet'], data['sent'])
         cursor.execute(packet_insert, data_tuple)
         sqliteConnection.commit()
         print(f"{cursor.rowcount} {insert_mes} packet table")
