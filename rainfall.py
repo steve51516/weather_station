@@ -2,11 +2,9 @@ from gpiozero import Button
 import time
 
 bucket = Button(5)
-BUCKET_SIZE = 0.2794
+#BUCKET_SIZE = 0.2794 # mm
+BUCKET_SIZE = 0.011 # inches
 tips = 0
-
-
-    
 
 def bucket_tipped():
     global tips
