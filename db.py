@@ -57,12 +57,12 @@ def db_connect():
         sys.exit(1)
 
 def read_save_sensors(data):
-    weather_insert = """INSERT INTO weather(stationid, ambient_temperature, wind_direction, wind_speed, wind_gust_speed, humidity, air_pressure, rainfall, pm25, pm10) 
+    sensors_insert = """INSERT INTO sensors(stationid, ambient_temperature, wind_direction, wind_speed, wind_gust_speed, humidity, air_pressure, rainfall, pm25, pm10) 
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-    data_tuple = (data['callsign'], data['temperature'], data['pressure'], data['humidity'], data['pm25'], data['pm10'])
+    data_tuple = (data['callsign'], data['temperature'], data['wdir'], data['wspeed'], data['wgusts'], data['humidity'], data['pressure'], data['rainfall'], data['pm25'], data['pm10'])
     conn = db_connect()
     cur = conn.cursor()
-    cur.execute(weather_insert, data_tuple)
+    cur.execute(sensors_insert, data_tuple)
     conn.commit(); conn.close()
 
 def read_save_packet(data):
