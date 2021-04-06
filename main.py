@@ -14,8 +14,9 @@ if __name__=="__main__":
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
         if config['sensors'].getboolean(item) is False: data[item] = "..."
-    th_rain = th.Thread(target=monitor_rainfall, daemon=True)
-    th_rain.start()
+    if config['sensors'].getboolean('rain1h') is True:
+        th_rain = th.Thread(target=monitor_rainfall, daemon=True)
+        th_rain.start()
         
     while True:
         tmp = sensor.get_data()
