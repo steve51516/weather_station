@@ -3,3 +3,4 @@ __pycache__/
 wxdata.db
 logger.py
 workspace.code-workspace
+setup.sh
