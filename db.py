@@ -1,6 +1,5 @@
 import mariadb as db
 from time import sleep
-from main import config
 
 def create_db():
     db_init = """ CREATE DATABASE IF NOT EXISTS weather;"""
@@ -27,11 +26,11 @@ def create_db():
 
     try:
         conn = db.connect(
-            user=config['database']['user'],
-            password=config['database']['password'],
-            host=config['database']['host'],
-            database=config['database']['database'],
-            port=config['database']['port']
+            user="wxstation",
+            password="password1",
+            host="127.0.0.1",
+            database="weather",
+            port=3306
         )
         cur = conn.cursor()
         cur.execute(db_init); conn.commit()
