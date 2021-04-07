@@ -1,5 +1,4 @@
 from gpiozero import Button
-import time
 
 bucket = Button(5)
 #BUCKET_SIZE = 0.2794 # mm
