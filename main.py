@@ -30,7 +30,10 @@ if __name__=="__main__":
         else:
             data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
 
-        db.read_save_sensors(data) # Write to weather table
-        aprs.send_data(data, config) # Send data to server if enabled and save packet to database
+        #db.read_save_sensors(data) # Write to weather table
+        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
+        th_sensorsave.start(); th_senddata.start()
+        #aprs.send_data(data, config) # Send data to server if enabled and save packet to database
+        th_senddata.join(); th_sensorsave.join()
         reset_rainfall() # reset tips variable
         stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
