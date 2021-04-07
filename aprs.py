@@ -1,13 +1,15 @@
 import aprslib, time
 from bme280pi import Sensor
 from math import trunc
+from db import rain_avg, read_save_packet
 
 def format_data(data, config):
-        tmp = data # Create copy so that original data dictionary is not modified
+        tmp = data.copy() # Create copy so that original data dictionary is not modified
         tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
         tmp['temperature'] = int(data['temperature'])
         tmp['humidity'] = int(tmp['humidity'])
         tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
+        tmp['rain1h'], tmp['rain24h'], tmp['rain00m'] = rain_avg(1), rain_avg(24), rain_avg(00) # Get rain averages
         # Temperature must be 3 digits
         if tmp['temperature'] < 100 and tmp['temperature'] > 9: # Add 0 in front if temperature is between 0 and 99
             tmp['temperature'] = f"0{tmp['temperature']}"
@@ -22,6 +24,7 @@ def format_data(data, config):
             tmp['humidity'] = "00"
 
         packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
+        tmp.clear()
         return packet
         
 def send_data(data, config):
@@ -42,7 +45,7 @@ def send_data(data, config):
                 finally:
                     AIS.close()
             print(f"Packet sent to {config['servers'][server]}")
-            sent = 1
+            transmitted = 1
     else:
-        sent = 0
-    return sent,packet
+        transmitted = 0
+    read_save_packet(packet, transmitted)
