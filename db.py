@@ -42,7 +42,11 @@ def format_rain(rain):
         return "000"
     else:
         rain1avg = str(round(float(rain[0]), 2))
-        return rain1avg.replace('.', '')
+        rain1avg = rain1avg.replace('.', '')
+    if rain1avg == "00":
+        return "000"
+    else:
+        return rain1avg
 
 def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past hour, 24 for past 24 hours
     if hours == 00: # Queries average rainfall between now and 00:00 of today
