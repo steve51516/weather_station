@@ -4,7 +4,7 @@ from math import trunc
 from db import rain_avg, read_save_packet
 
 def format_data(data, config):
-        tmp = data # Create copy so that original data dictionary is not modified
+        tmp = data.copy() # Create copy so that original data dictionary is not modified
         tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
         tmp['temperature'] = int(data['temperature'])
         tmp['humidity'] = int(tmp['humidity'])
