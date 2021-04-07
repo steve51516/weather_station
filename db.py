@@ -47,7 +47,7 @@ def db_connect():
         try:
             conn = db.connect(
                 user="wxstation",
-                password="password1",
+                password="P@ssw0rd",
                 host="127.0.0.1",
                 port=3306,
                 database="weather"
@@ -76,3 +76,14 @@ def read_save_packet(data):
     cur = conn.cursor()
     cur.execute(packet_insert, data_tuple)
     conn.commit(); conn.close()
+
+def rain_1hravg():
+    query = """SELECT AVG(rainfall) FROM sensors WHERE created <=date_sub(now(),interval 1 hour);"""
+    conn = db_connect(); cur = conn.cursor()
+    cur.execute(query)
+    row = cur.fetchone()
+    if row[0] is None:
+        return "000"
+    else:
+        rain1avg = str(round(float(row[0]), 2))
+        return rain1avg.replace('.', '')    
