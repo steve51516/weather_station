@@ -7,6 +7,7 @@ from rainfall import tips, monitor_rainfall, reset_rainfall
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
+    print("reading config file...")
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
     sensor = Sensor(0x77)
@@ -16,7 +17,8 @@ if __name__=="__main__":
     if config['sensors'].getboolean('rain1h') is True:
         th_rain = th.Thread(target=monitor_rainfall, daemon=True)
         th_rain.start()
-        
+    print("Done reading config file.\nStarting main program now.")
+
     while True:
         tmp = sensor.get_data()
         data['temperature'] = sensor.get_temperature(unit='F')
@@ -30,10 +32,8 @@ if __name__=="__main__":
         else:
             data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
 
-        #db.read_save_sensors(data) # Write to weather table
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
-        #aprs.send_data(data, config) # Send data to server if enabled and save packet to database
         th_senddata.join(); th_sensorsave.join()
         reset_rainfall() # reset tips variable
         stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
