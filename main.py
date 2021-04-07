@@ -13,7 +13,7 @@ if __name__=="__main__":
     db.create_db()
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of "..."
-        if config['sensors'].getboolean(item) is False: data[item] = "..."
+        if config['sensors'].getboolean(item) is False: data[item] = "000"
     if config['sensors'].getboolean('rain1h') is True:
         th_rain = th.Thread(target=monitor_rainfall, daemon=True)
         th_rain.start()
@@ -33,6 +33,8 @@ if __name__=="__main__":
         if config['sensors'].getboolean('rain1h') is True:
             data['rainfall'] = tips
             reset_rainfall() # reset tips variable
+        else:
+            data['rainfall'] = 0
 
         db.read_save_sensors(data) # Write to weather table before values get rounded
         data['sent'], data['packet'] = aprs.send_data(data, config)
