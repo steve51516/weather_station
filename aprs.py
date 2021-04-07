@@ -21,7 +21,7 @@ def format_data(data, config):
         if tmp['humidity'] == 100:
             tmp['humidity'] = "00"
 
-        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['avgwind']}g{tmp['peakwind']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
+        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
         return packet
         
 def send_data(data, config):
