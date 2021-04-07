@@ -69,7 +69,7 @@ def read_save_sensors(data):
     conn.commit(); conn.close()
 
 def read_save_packet(data):
-    packet_insert = """INSERT INTO packets(packet, Sent) 
+    packet_insert = """INSERT INTO packets(packet, transmitted) 
     VALUES(?, ?);"""
     data_tuple = (data['packet'], data['sent'])
     conn = db_connect()
