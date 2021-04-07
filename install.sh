@@ -26,7 +26,7 @@ create_user() {
         useradd -m -d /opt/wxstation -c "wxstation service account" -r wxstation
         usermod -aG tty wxstation
     fi
-    mv wxstation.service /etc/systemd/system/
+    cp wxstation.service /etc/systemd/system/
     systemctl --enable wxstation.service
     echo "Installed wxstation.service"
 }
@@ -52,7 +52,7 @@ setup_db() {
     mysql -e "UPDATE mysql.user SET Password = PASSWORD('$root_password') WHERE User = 'root'"
     echo "Creating $database_name database"
     mysql -e "CREATE DATABASE IF NOT EXISTS $database_name;"
-    echo "Creating user $user\@localhost"
+    echo "Creating user $user@localhost"
     mysql -e "CREATE USER IF NOT EXISTS '$user'@localhost IDENTIFIED BY '$wxstation_password';"
     echo "Granting $user privileges to $database_name"
     mysql -e "GRANT ALL PRIVILEGES ON \`$database_name\`.* TO '$user'@localhost;"
@@ -84,6 +84,12 @@ setup_db() {
             );"
     echo "Mariadb has been setup!"
 }
+if [[ "$1" == "--database-only" ]]; then
+    echo "Setting up database only!"
+    setup_db
+    echo "Done setting up database!"
+    exit 0
+fi
 create_user
 install_pkgs
 setup_db

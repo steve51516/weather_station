@@ -7,7 +7,7 @@ from rainfall import tips, monitor_rainfall, reset_rainfall
 from subprocess import call
 
 if __name__=="__main__":
-    rc = call("./setup.sh")
+    rc = call("./setup.sh --database-only")
     config = configparser.ConfigParser()
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
