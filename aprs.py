@@ -1,7 +1,7 @@
 import aprslib, time
 from bme280pi import Sensor
 from math import trunc
-from db import rain_avg
+from db import rain_avg, read_save_packet
 
 def format_data(data, config):
         tmp = data # Create copy so that original data dictionary is not modified
@@ -45,7 +45,7 @@ def send_data(data, config):
                 finally:
                     AIS.close()
             print(f"Packet sent to {config['servers'][server]}")
-            sent = 1
+            transmitted = 1
     else:
-        sent = 0
-    return sent,packet
+        transmitted = 0
+    read_save_packet(packet, transmitted)
