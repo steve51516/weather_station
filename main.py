@@ -3,16 +3,18 @@ from sds011 import read_sds011, show_air_values
 from sys import stdout
 import time, aprs, db, configparser, threading as th
 from time import sleep
-from rainfall import *
+from rainfall import tips, monitor_rainfall, reset_rainfall
+from subprocess import call
 
 if __name__=="__main__":
+    rc = call("./setup.sh")
     config = configparser.ConfigParser()
     config.read('wxstation.conf')
     #sensor = Sensor(hex(config['bme280']['device']))
     sensor = Sensor(0x77)
     db.create_db()
     data = { 'callsign': config['aprs']['callsign'] }
-    for item in config['sensors']: # If an item in config is boolean false assign value of "..."
+    for item in config['sensors']: # If an item in config is boolean false assign value of "000" to signify uncollected data
         if config['sensors'].getboolean(item) is False: data[item] = "000"
     if config['sensors'].getboolean('rain1h') is True:
         th_rain = th.Thread(target=monitor_rainfall, daemon=True)
@@ -40,5 +42,5 @@ if __name__=="__main__":
         data['sent'], data['packet'] = aprs.send_data(data, config)
 
         db.read_save_packet(data) # Write to packet table
-        #print(data['packet'])
+        print(data['packet'])
         stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
