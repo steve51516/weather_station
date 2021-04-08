@@ -42,7 +42,7 @@ if __name__=="__main__":
     while True:
         if 'th_sds011' in locals():
             th_sds011.start()
-        if th_rain in locals():
+        if 'th_rain' in locals():
             data['rainfall'] = tips; reset_rainfall() # 0 if disabled or actual value if enabled, reset after saving value
         data['temperature'] = sensor.get_temperature(unit='F')
         data['pressure'] = sensor.get_pressure()
