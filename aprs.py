@@ -63,8 +63,7 @@ def send_data(data, config):
                     AIS.sendall(packet)
                     print(f"Packet transmitted to {config['servers'][server]} at {time.strftime('%Y-%m-%d %H:%M', time.gmtime())} UTC time")
                 except Exception as error:
-                    print(error)
-                    print(f"Retry number: {i}\n Trying again in {delay} seconds...")
+                    print(f"{error}\nRetry number: {i}\n Trying again in {delay} seconds...")
                     time.sleep(delay)
                     continue
                 finally:
