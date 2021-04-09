@@ -8,10 +8,7 @@ tips = 0
 def bucket_tipped():
     global tips
     tips += 1
-    print(f"Bucket tipped! Total rainfall calculated is {tips * BUCKET_SIZE}")
-
-    # TODO save each tip to database to create hourly and last 24 hour reports
-    # Must switch to mariadb for multiple writes at the same time
+    #print(f"Bucket tipped! Total rainfall calculated is {tips * BUCKET_SIZE}")
 
 def reset_rainfall():
     global tips
