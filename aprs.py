@@ -36,7 +36,7 @@ def format_humidity(num):
     else:
         return num
 
-def format_data(data, config):
+def make_packet(data, config):
         tmp = data.copy() # Create copy so that original data dictionary is not modified
         tmp['pressure'] = add_zeros(trunc(round(tmp['pressure'], 2) * 10.)) # shift decimal point to the left 1 and round
         tmp['temperature'] = add_zeros(round(tmp['temperature']))
@@ -52,7 +52,7 @@ def format_data(data, config):
         return packet
         
 def send_data(data, config):
-    packet = format_data(data, config)
+    packet = make_packet(data, config)
     if config.getboolean('aprs', 'sendall'):
         for server in config['servers']:
             for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
@@ -61,6 +61,7 @@ def send_data(data, config):
                 try:
                     AIS.connect()
                     AIS.sendall(packet)
+                    print(f"Packet transmitted to {config['servers'][server]} at {time.strftime('%Y-%m-%d %H:%M', time.gmtime())} UTC time")
                 except Exception as error:
                     print(error)
                     print(f"Retry number: {i}\n Trying again in {delay} seconds...")
@@ -68,7 +69,6 @@ def send_data(data, config):
                     continue
                 finally:
                     AIS.close()
-            print(f"Packet sent to {config['servers'][server]}")
             transmitted = 1
     else:
         transmitted = 0
