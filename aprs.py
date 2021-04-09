@@ -3,7 +3,7 @@ from bme280pi import Sensor
 from math import trunc
 from db import rain_avg, read_save_packet
 
-# Convert temperature, wind speed, and wind gusts to 3 digits
+# Convert temperature, wind direction, wind speed, and wind gusts to 3 digits
 def add_zeros(num):
         if num < 100 and num > 9: # Add 0 in front if temperature is between 0 and 99
             return f"0{num}"
@@ -22,7 +22,7 @@ def format_rain(rain):
     else:
         rain1avg = str(round(float(rain), 2))
         rain1avg = rain1avg.replace('.', '')
-    if rain1avg == "00":
+    if rain1avg == "00" or "0":
         return "000"
     else:
         return rain1avg
@@ -38,15 +38,16 @@ def format_humidity(num):
 
 def format_data(data, config):
         tmp = data.copy() # Create copy so that original data dictionary is not modified
-        tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
+        tmp['pressure'] = add_zeros(trunc(round(tmp['pressure'], 2) * 10.)) # shift decimal point to the left 1 and round
         tmp['temperature'] = add_zeros(round(tmp['temperature']))
         tmp['wspeed'] = add_zeros(round(tmp['wspeed']))
         tmp['wgusts'] = add_zeros(round(tmp['wgusts']))
         tmp['humidity'] = format_humidity(round(tmp['humidity']))
         tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         tmp['rain1h'], tmp['rain24h'], tmp['rain00m'] = format_rain(rain_avg(1)), format_rain(rain_avg(24)), format_rain(rain_avg(00)) # Get rain averages
+        tmp['wdir'] = add_zeros(tmp['wdir'])
 
-        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
+        packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{tmp['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
         tmp.clear()
         return packet
         
