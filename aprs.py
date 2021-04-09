@@ -26,10 +26,10 @@ def format_humidity(num):
 def format_data(data, config):
         tmp = data.copy() # Create copy so that original data dictionary is not modified
         tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
-        tmp['temperature'] = add_zeros(int(tmp['temperature']))
-        tmp['wspeed'] = add_zeros(int(tmp['wspeed']))
-        tmp['wgusts'] = add_zeros(int(tmp['wgusts']))
-        tmp['humidity'] = format_humidity(int(tmp['humidity']))
+        tmp['temperature'] = add_zeros(round(tmp['temperature']))
+        tmp['wspeed'] = add_zeros(round(tmp['wspeed']))
+        tmp['wgusts'] = add_zeros(round(tmp['wgusts']))
+        tmp['humidity'] = format_humidity(round(tmp['humidity']))
         tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
         tmp['rain1h'], tmp['rain24h'], tmp['rain00m'] = rain_avg(1), rain_avg(24), rain_avg(00) # Get rain averages
 
