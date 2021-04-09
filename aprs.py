@@ -7,7 +7,7 @@ from db import rain_avg, read_save_packet
 def add_zeros(num):
         if num < 100 and num > 9: # Add 0 in front if temperature is between 0 and 99
             return f"0{num}"
-        elif num > 9 and num >= 0: # add 00 in front if between 0 and 9
+        elif num < 9 and num >= 0: # add 00 in front if between 0 and 9
             return f"00{num}"
         elif num < 0 and num > -9:
             return f"00{num}"
@@ -31,6 +31,8 @@ def format_rain(rain):
 def format_humidity(num):
     if num == 100:
         return "00"
+    elif num <= 9:
+        return add_zeros(num)
     else:
         return num
 
