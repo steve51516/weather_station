@@ -26,7 +26,8 @@ if __name__=="__main__":
     config = configparser.ConfigParser()
     print("reading config file...")
     config.read('wxstation.conf')
-    sensor = start_bme280()
+    if config['sensors'].getboolean('bme280'):
+        sensor = start_bme280()
     data = enable_disable_sensors()
     if config['sensors'].getboolean('rain1h'):
         from rainfall import tips, monitor_rainfall, reset_rainfall
@@ -54,9 +55,10 @@ if __name__=="__main__":
             th_sds011.start()
         if 'th_rain' in locals():
             data['rainfall'] = tips; reset_rainfall() # 0 if disabled or actual value if enabled, reset after saving value
-        data['temperature'] = sensor.get_temperature(unit='F')
-        data['pressure'] = sensor.get_pressure()
-        data['humidity'] = sensor.get_humidity()
+        if config['sensors'].getboolean('bme280'):
+            data['temperature'] = sensor.get_temperature(unit='F')
+            data['pressure'] = sensor.get_pressure()
+            data['humidity'] = sensor.get_humidity()
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
             data['wspeed'] = wind_avg(wind_list)
