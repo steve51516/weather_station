@@ -12,10 +12,10 @@ if __name__=="__main__":
     except Exception:
         sensor = Sensor(0x76)
     try:
-        print(sensor._get_info_about_sensor())
+        chipid, version = sensor._get_info_about_sensor()
+        print(f"BME280 Information:\n\tChipID: {chipid}\n\tVersion: {version}")
     except Exception as e:
-        print(e)
-        print("Unable to display sensor device information")
+        print(f"{e}: Unable to get BME280 ChipID and Version")
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
         if config['sensors'].getboolean(item) is False: data[item] = 0 # Zeros will be converted to "000" in aprs module
