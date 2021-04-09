@@ -37,7 +37,8 @@ if __name__=="__main__":
     else:
         data['rainfall'] = 0
     if config['sensors'].getboolean('wspeed'):
-        from wspeed import monitor_wind, calculate_speed, wind_avg, wind_list
+        from wspeed import monitor_wind, calculate_speed, wind_list
+        from statistics import mean
         print("Starting wind speed monitoring thread.")
         th_wmonitor = th.Thread(target=monitor_wind, daemon=True)
         th_wspeed = th.Thread(target=calculate_speed, daemon=True)
@@ -61,10 +62,11 @@ if __name__=="__main__":
             data['humidity'] = sensor.get_humidity()
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
-            data['wspeed'] = wind_avg(wind_list)
             if len(wind_list) > 0:
-                data['wgusts'] = max(wind_list)
+                data['wspeed'], data['wgusts'] = mean(wind_list), max(wind_list)
                 wind_list.clear()
+            else:
+                data['wspeed'], data['wgusts'] = 0, 0
         if 'th_sds011' in locals():
             th_sds011.join()
             data['pm25'], data['pm10'] = air_values['pm25'], air_values['pm10']
