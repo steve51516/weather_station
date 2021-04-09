@@ -17,8 +17,8 @@ if __name__=="__main__":
         print(e)
         print("Unable to display sensor device information")
     data = { 'callsign': config['aprs']['callsign'] }
-    for item in config['sensors']: # If an item in config is boolean false assign value of "000" to signify uncollected data
-        if config['sensors'].getboolean(item) is False: data[item] = "000"
+    for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
+        if config['sensors'].getboolean(item) is False: data[item] = 0 # Zeros will be converted to "000" in aprs module
     if config['sensors'].getboolean('rain1h') is True:
         from rainfall import tips, monitor_rainfall, reset_rainfall
         print("Starting rainfall monitoring thread.")
