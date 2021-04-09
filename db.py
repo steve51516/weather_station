@@ -15,7 +15,6 @@ def db_connect():
             return conn
         except db.Error as e:
             print(f"Error connecting to MariaDB Server: {e}\n\t Retry number {i}\n\t Retrying in {delay} seconds...")
-            #sys.exit(1)
             sleep(delay)
             continue
 
@@ -37,17 +36,6 @@ def read_save_packet(packet, transmitted):
     cur.execute(packet_insert, data_tuple)
     conn.commit(); conn.close()
 
-def format_rain(rain):
-    if rain[0] is None:
-        return "000"
-    else:
-        rain1avg = str(round(float(rain[0]), 2))
-        rain1avg = rain1avg.replace('.', '')
-    if rain1avg == "00":
-        return "000"
-    else:
-        return rain1avg
-
 def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past hour, 24 for past 24 hours
     if hours == 00: # Queries average rainfall between now and 00:00 of today
         query = """SELECT AVG(rainfall) FROM sensors where created between CURRENT_DATE() AND NOW();"""
@@ -58,4 +46,4 @@ def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past ho
     cur.execute(query)
     row = cur.fetchone()
     conn.close()
-    return format_rain(row)    
+    return row[0]

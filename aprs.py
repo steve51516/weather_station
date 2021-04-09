@@ -16,6 +16,17 @@ def add_zeros(num):
         else:
             return num
 
+def format_rain(rain):
+    if rain is None:
+        return "000"
+    else:
+        rain1avg = str(round(float(rain), 2))
+        rain1avg = rain1avg.replace('.', '')
+    if rain1avg == "00":
+        return "000"
+    else:
+        return rain1avg
+
 # Humidity must be 2 digits. If humidity is 100% assign value of 00
 def format_humidity(num):
     if num == 100:
@@ -31,7 +42,7 @@ def format_data(data, config):
         tmp['wgusts'] = add_zeros(round(tmp['wgusts']))
         tmp['humidity'] = format_humidity(round(tmp['humidity']))
         tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
-        tmp['rain1h'], tmp['rain24h'], tmp['rain00m'] = rain_avg(1), rain_avg(24), rain_avg(00) # Get rain averages
+        tmp['rain1h'], tmp['rain24h'], tmp['rain00m'] = format_rain(rain_avg(1)), format_rain(rain_avg(24)), format_rain(rain_avg(00)) # Get rain averages
 
         packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{data['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
         tmp.clear()
