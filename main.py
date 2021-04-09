@@ -3,10 +3,7 @@ from sys import stdout
 import aprs, db, configparser, threading as th
 from time import sleep, time
 
-if __name__=="__main__":
-    config = configparser.ConfigParser()
-    print("reading config file...")
-    config.read('wxstation.conf')
+def start_bme280():
     try:
         sensor = Sensor(0x77)
     except Exception:
@@ -16,10 +13,22 @@ if __name__=="__main__":
         print(f"BME280 Information:\n\tChipID: {chipid}\n\tVersion: {version}")
     except Exception as e:
         print(f"{e}: Unable to get BME280 ChipID and Version")
+    return sensor
+
+def enable_disable_sensors():
     data = { 'callsign': config['aprs']['callsign'] }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
-        if config['sensors'].getboolean(item) is False: data[item] = 0 # Zeros will be converted to "000" in aprs module
-    if config['sensors'].getboolean('rain1h') is True:
+        if config['sensors'].getboolean(item) is False: 
+            data[item] = 0 # Zeros will be converted to "000" in aprs module
+    return data
+
+if __name__=="__main__":
+    config = configparser.ConfigParser()
+    print("reading config file...")
+    config.read('wxstation.conf')
+    sensor = start_bme280()
+    data = enable_disable_sensors()
+    if config['sensors'].getboolean('rain1h'):
         from rainfall import tips, monitor_rainfall, reset_rainfall
         print("Starting rainfall monitoring thread.")
         th_rain = th.Thread(target=monitor_rainfall, daemon=True)
@@ -32,7 +41,7 @@ if __name__=="__main__":
         th_wmonitor = th.Thread(target=monitor_wind, daemon=True)
         th_wspeed = th.Thread(target=calculate_speed, daemon=True)
         th_wspeed.start(); th_wmonitor.start()
-    if config['serial'].getboolean('enabled') is True: # If SDS011 is enabled collect readings
+    if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
         from sds011 import read_sds011, show_air_values, air_values
         th_sds011 = th.Thread(target=read_sds011, args=config) # Assign true readings
     else:
@@ -51,7 +60,7 @@ if __name__=="__main__":
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
             data['wspeed'] = wind_avg(wind_list)
-            if len(wind_list) < 0:
+            if len(wind_list) > 0:
                 data['wgusts'] = max(wind_list)
                 wind_list.clear()
         if 'th_sds011' in locals():
