@@ -1,7 +1,7 @@
 from bme280pi import Sensor
 from sys import stdout
-import time, aprs, db, configparser, threading as th
-from time import sleep
+import aprs, db, configparser, threading as th
+from time import sleep, time
 
 if __name__=="__main__":
     config = configparser.ConfigParser()
@@ -40,6 +40,7 @@ if __name__=="__main__":
     print("Done reading config file.\nStarting main program now.")
 
     while True:
+        start_time = time() # Capture loop start time
         if 'th_sds011' in locals():
             th_sds011.start()
         if 'th_rain' in locals():
@@ -60,5 +61,7 @@ if __name__=="__main__":
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
         th_senddata.join(); th_sensorsave.join()
-
-        stdout.flush(); time.sleep(300) # Flush buffered output and Wait 5 minutes
+        end_time = time() # Capture end time
+        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
+        stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
