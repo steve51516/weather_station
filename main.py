@@ -22,6 +22,12 @@ def enable_disable_sensors():
             data[item] = 0 # Zeros will be converted to "000" in aprs module
     return data
 
+def wait_delay(start_time):
+        end_time = time() # Capture end time
+        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
+        stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
+
 if __name__=="__main__":
     config = configparser.ConfigParser()
     print("reading config file...")
@@ -85,7 +91,4 @@ if __name__=="__main__":
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data, args=(data, config)), th.Thread(target=db.read_save_sensors, args=(data))
         th_sensorsave.start(); th_senddata.start()
         th_senddata.join(); th_sensorsave.join()
-        end_time = time() # Capture end time
-        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
-        print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
-        stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
+        wait_delay(start_time)
