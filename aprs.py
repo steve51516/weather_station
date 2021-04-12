@@ -38,7 +38,7 @@ def format_humidity(num):
 
 def make_packet(data, config):
         tmp = data.copy() # Create copy so that original data dictionary is not modified
-        tmp['pressure'] = add_zeros(trunc(round(tmp['pressure'], 2) * 10.)) # shift decimal point to the left 1 and round
+        tmp['pressure'] = trunc(round(tmp['pressure'], 2) * 10.) # shift decimal point to the left 1 and round
         tmp['temperature'] = add_zeros(round(tmp['temperature']))
         tmp['wspeed'] = add_zeros(round(tmp['wspeed']))
         tmp['wgusts'] = add_zeros(round(tmp['wgusts']))
