@@ -1,5 +1,6 @@
 import mariadb as db
 from time import sleep
+from rainfall import tips, BUCKET_SIZE
 
 def db_connect():
     for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
@@ -46,4 +47,7 @@ def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past ho
     cur.execute(query)
     row = cur.fetchone()
     conn.close()
-    return 0.0 if row[0] is None else row[0] # Rainfall readings of 0.000 will return NULL, return 0 if NULL
+    if row[0] is None and tips != 0:
+        return (tips * BUCKET_SIZE) # Return total rain amount for the last 5 minutes. This will occur if rain has been measured but not saved to database yet.
+    else:
+        return 0.0 if row[0] is None else row[0] # Rainfall readings of 0.000 will return NULL, return 0 if NULL
