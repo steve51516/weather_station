@@ -34,7 +34,7 @@ create_user() {
         usermod -aG tty wxstation
     fi
     cp wxstation.service /etc/systemd/system/
-    systemctl --enable wxstation.service
+    systemctl enable wxstation.service
     echo "Installed wxstation.service"
 }
 
