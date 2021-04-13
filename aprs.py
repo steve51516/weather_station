@@ -48,7 +48,7 @@ def make_packet(data, config):
         tmp['wdir'] = add_zeros(tmp['wdir'])
 
         packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{tmp['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
-        tmp.clear()
+        del(tmp) # Clean up temporary dictionary
         return packet
         
 def send_data(data, config):
@@ -71,4 +71,4 @@ def send_data(data, config):
             transmitted = 1
     else:
         transmitted = 0
-    read_save_packet(packet, transmitted)
+    read_save_packet(packet[:-len(config['aprs']['comment'])], transmitted) # Store packet in database without comment field
