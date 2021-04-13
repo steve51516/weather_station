@@ -88,7 +88,7 @@ if __name__=="__main__":
         if 'th_wdir' in locals():            
             data['wdir'] = wdir_average() # Record average wind direction in degrees and reset readings to average
 
-        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data, args=(data, config)), th.Thread(target=db.read_save_sensors, args=(data))
+        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
         th_senddata.join(); th_sensorsave.join()
         wait_delay(start_time)
