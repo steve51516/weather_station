@@ -36,24 +36,26 @@ def wdir_average():
     global wind_angles
     import math
     sin_sum, cos_sum = 0.0, 0.0
+    try:
+        for angle in wind_angles:
+            r = math.radians(angle)
+            sin_sum += math.sin(r)
+            cos_sum += math.cos(r)
+        
+        flen = float(len(wind_angles))
+        s, c = sin_sum / flen, cos_sum / flen
+        arc = math.degrees(math.atan(s / c))
 
-    for angle in wind_angles:
-        r = math.radians(angle)
-        sin_sum += math.sin(r)
-        cos_sum += math.cos(r)
-    
-    flen = float(len(wind_angles))
-    s, c = sin_sum / flen, cos_sum / flen
-    arc = math.degrees(math.atan(s / c))
-
-    if s > 0 and c > 0:
-        avg = arc
-    elif c < 0:
-        avg = arc + 180
-    elif s < 0 and c > 0:
-        avg = arc + 360
-    wind_angles.clear() # Clear readings to average
-    return 0.0 if avg == 360 else avg
+        if s > 0 and c > 0:
+            avg = arc
+        elif c < 0:
+            avg = arc + 180
+        elif s < 0 and c > 0:
+            avg = arc + 360
+        wind_angles.clear() # Clear readings to average
+        return 0.0 if avg == 360 else round(avg)
+    except ZeroDivisionError as e:
+        print(f"ZeroDivisionError: {e}\nWind direction could not be calculated!")
 
 def monitor_wdir():
     from gpiozero import MCP3008
