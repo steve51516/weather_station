@@ -38,9 +38,9 @@ def read_save_packet(packet, transmitted):
 
 def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past hour, 24 for past 24 hours
     if hours == 00: # Queries average rainfall between now and 00:00 of today
-        query = """SELECT AVG(rainfall) FROM sensors where created between CURRENT_DATE() AND NOW();"""
+        query = """SELECT AVG(rainfall) FROM sensors where created between CURRENT_DATE() AND NOW() AND rainfall!=0;"""
     elif hours == 1 or 24: # Queries average ranfall for the past hour or 24 hours
-        query = f"SELECT AVG(rainfall) FROM sensors WHERE created >= now() - INTERVAL {hours} HOUR;"
+        query = f"SELECT AVG(rainfall) FROM sensors WHERE created >= now() - INTERVAL {hours} HOUR AND rainfall!=0;"
 
     conn = db_connect(); cur = conn.cursor()
     cur.execute(query)
