@@ -46,4 +46,4 @@ def rain_avg(hours): # valid arguements are 00 for since midnight, 1 for past ho
     cur.execute(query)
     row = cur.fetchone()
     conn.close()
-    return row[0]
+    return 0.0 if row[0] is None else row[0] # Rainfall readings of 0.000 will return NULL, return 0 if NULL

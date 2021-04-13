@@ -17,7 +17,7 @@ def add_zeros(num):
             return num
 
 def format_rain(rain):
-    if rain is None:
+    if rain is 0.0:
         return "000"
     else:
         rain1avg = str(round(float(rain), 2))

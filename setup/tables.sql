@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS weather.sensors(
     wind_speed DECIMAL(6,2),
     wind_gust_speed DECIMAL(6,2),
     humidity DECIMAL(6,2) NOT NULL,
-    rainfall DECIMAL(6,2),
+    rainfall DECIMAL(6,3),
     air_pressure DECIMAL(6,2) NOT NULL,
     PM25 DECIMAL(6,2),
     PM10 DECIMAL(6,2)
