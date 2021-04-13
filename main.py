@@ -22,6 +22,12 @@ def enable_disable_sensors():
             data[item] = 0 # Zeros will be converted to "000" in aprs module
     return data
 
+def wait_delay(start_time):
+        end_time = time() # Capture end time
+        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
+        stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
+
 if __name__=="__main__":
     config = configparser.ConfigParser()
     print("reading config file...")
@@ -48,14 +54,21 @@ if __name__=="__main__":
         th_sds011 = th.Thread(target=read_sds011, args=config) # Assign true readings
     else:
         data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
+    if config['sensors'].getboolean('wdir'):
+        from wdir import monitor_wdir, wdir_average
+        print("Starting wind direction monitoring thread.")
+        th_wdir = th.Thread(target=monitor_wdir, daemon=True)
+        th_wdir.start()
     print("Done reading config file.\nStarting main program now.")
 
     while True:
         start_time = time() # Capture loop start time
         if 'th_sds011' in locals():
             th_sds011.start()
+        
         if 'th_rain' in locals():
             data['rainfall'] = tips; reset_rainfall() # 0 if disabled or actual value if enabled, reset after saving value
+        
         if config['sensors'].getboolean('bme280'):
             data['temperature'] = sensor.get_temperature(unit='F')
             data['pressure'] = sensor.get_pressure()
@@ -67,14 +80,15 @@ if __name__=="__main__":
                 wind_list.clear()
             else:
                 data['wspeed'], data['wgusts'] = 0, 0
+
         if 'th_sds011' in locals():
             th_sds011.join()
             data['pm25'], data['pm10'] = air_values['pm25'], air_values['pm10']
 
-        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
+        if 'th_wdir' in locals():            
+            data['wdir'] = wdir_average() # Record average wind direction in degrees and reset readings to average
+
+        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data, args=(data, config)), th.Thread(target=db.read_save_sensors, args=(data))
         th_sensorsave.start(); th_senddata.start()
         th_senddata.join(); th_sensorsave.join()
-        end_time = time() # Capture end time
-        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
-        print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
-        stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
+        wait_delay(start_time)
