@@ -43,11 +43,12 @@ if __name__=="__main__":
     else:
         data['rainfall'] = 0
     if config['sensors'].getboolean('wspeed'):
-        from wspeed import monitor_wind, calculate_speed, wind_list
+        from wspeed import WindMonitor
         from statistics import mean
         print("Starting wind speed monitoring thread.")
-        th_wmonitor = th.Thread(target=monitor_wind, daemon=True)
-        th_wspeed = th.Thread(target=calculate_speed, daemon=True)
+        stop_event = th.Event()
+        th_wmonitor = th.Thread(target=WindMonitor.monitor_wind, daemon=True)
+        th_wspeed = th.Thread(target=WindMonitor.calculate_speed, args=[stop_event], daemon=True)
         th_wspeed.start(); th_wmonitor.start()
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
         from sds011 import read_sds011, show_air_values, air_values
@@ -75,10 +76,15 @@ if __name__=="__main__":
             data['humidity'] = sensor.get_humidity()
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
-            if len(wind_list) > 0:
-                data['wspeed'], data['wgusts'] = mean(wind_list), max(wind_list)
-                wind_list.clear()
-            else:
+            if len(WindMonitor.wind_list) > 0:
+                stop_event.set()
+                with WindMonitor.wind_list_lock:
+                    data['wspeed'], data['wgusts'] = mean(WindMonitor.wind_list), max(WindMonitor.wind_list)
+                    WindMonitor.wind_list.clear()
+                    stop_event.clear()
+                if not th_wspeed.is_alive():
+                    th_wspeed.start()
+            elif data['wspeed'] != 0 and data['wgusts'] != 0:
                 data['wspeed'], data['wgusts'] = 0, 0
 
         if 'th_sds011' in locals():
