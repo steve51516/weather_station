@@ -91,6 +91,8 @@ if __name__=="__main__":
                     data['wspeed'], data['wgusts'] = mean(wmonitor.wind_list), max(wmonitor.wind_list)
                     wmonitor.wind_list.clear()
                     stop_event.clear()
+            else:
+                data['wgusts'] = 0
             #elif data['wspeed'] != 0 and data['wgusts'] != 0:
                 #data['wspeed'], data['wgusts'] = 0, 0
 
