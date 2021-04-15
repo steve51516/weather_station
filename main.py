@@ -16,7 +16,11 @@ def start_bme280():
     return sensor
 
 def enable_disable_sensors():
-    data = { 'callsign': config['aprs']['callsign'] }
+    data = {
+        'callsign': config['aprs']['callsign'],
+        'wspeed': 0,
+        'wgusts': 0
+    }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
         if config['sensors'].getboolean(item) is False: 
             data[item] = 0 # Zeros will be converted to "000" in aprs module
@@ -25,6 +29,10 @@ def enable_disable_sensors():
 def wait_delay(start_time):
         end_time = time() # Capture end time
         wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        if wait_time < 0:
+            abs(wait_time)
+        elif wait_time == 0:
+            wait_time = 300
         print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
         stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
 
@@ -45,13 +53,14 @@ if __name__=="__main__":
     if config['sensors'].getboolean('wspeed'):
         from wspeed import WindMonitor
         from statistics import mean
+        wmonitor = WindMonitor()
         print("Starting wind speed monitoring thread.")
         stop_event = th.Event()
-        th_wmonitor = th.Thread(target=WindMonitor.monitor_wind, daemon=True)
-        th_wspeed = th.Thread(target=WindMonitor.calculate_speed, args=[stop_event], daemon=True)
+        th_wmonitor = th.Thread(target=wmonitor.monitor_wind, daemon=True)
+        th_wspeed = th.Thread(target=wmonitor.calculate_speed, args=[stop_event], daemon=True)
         th_wspeed.start(); th_wmonitor.start()
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
-        from sds011 import read_sds011, show_air_values, air_values
+        from sds011 import read_sds011, air_values
         th_sds011 = th.Thread(target=read_sds011, args=config) # Assign true readings
     else:
         data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
@@ -76,16 +85,14 @@ if __name__=="__main__":
             data['humidity'] = sensor.get_humidity()
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
-            if len(WindMonitor.wind_list) > 0:
+            if len(wmonitor.wind_list) > 0:
                 stop_event.set()
-                with WindMonitor.wind_list_lock:
-                    data['wspeed'], data['wgusts'] = mean(WindMonitor.wind_list), max(WindMonitor.wind_list)
-                    WindMonitor.wind_list.clear()
+                with wmonitor.wind_list_lock:
+                    data['wspeed'], data['wgusts'] = mean(wmonitor.wind_list), max(wmonitor.wind_list)
+                    wmonitor.wind_list.clear()
                     stop_event.clear()
-                if not th_wspeed.is_alive():
-                    th_wspeed.start()
-            elif data['wspeed'] != 0 and data['wgusts'] != 0:
-                data['wspeed'], data['wgusts'] = 0, 0
+            #elif data['wspeed'] != 0 and data['wgusts'] != 0:
+                #data['wspeed'], data['wgusts'] = 0, 0
 
         if 'th_sds011' in locals():
             th_sds011.join()
