@@ -27,5 +27,5 @@ class RainMonitor:
             else:
                 sleep(2)
 
-    def monitor_rainfall(self):
+    def monitor(self):
         self.button.when_pressed = self.bucket_tipped

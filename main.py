@@ -47,7 +47,7 @@ if __name__=="__main__":
         from rainfall import RainMonitor
         rmonitor = RainMonitor()
         print("Starting rainfall monitoring thread.")
-        th_rain = th.Thread(target=rmonitor.rmonitor.monitor, daemon=True)
+        th_rain = th.Thread(target=rmonitor.monitor, daemon=True)
         th_rain.start()
     else:
         data['rainfall'] = 0
