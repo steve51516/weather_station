@@ -44,9 +44,10 @@ if __name__=="__main__":
         sensor = start_bme280()
     data = enable_disable_sensors()
     if config['sensors'].getboolean('rain1h'):
-        from rainfall import tips, monitor_rainfall, reset_rainfall
+        from rainfall import RainMonitor
+        rmonitor = RainMonitor()
         print("Starting rainfall monitoring thread.")
-        th_rain = th.Thread(target=monitor_rainfall, daemon=True)
+        th_rain = th.Thread(target=rmonitor.monitor_rainfall, daemon=True)
         th_rain.start()
     else:
         data['rainfall'] = 0
@@ -77,7 +78,7 @@ if __name__=="__main__":
             th_sds011.start()
         
         if 'th_rain' in locals():
-            data['rainfall'] = tips; reset_rainfall() # 0 if disabled or actual value if enabled, reset after saving value
+            data['rainfall'] = rmonitor.total_rain() # Get total rainfall and reset tips counter
         
         if config['sensors'].getboolean('bme280'):
             data['temperature'] = sensor.get_temperature(unit='F')
