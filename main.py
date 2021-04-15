@@ -61,8 +61,10 @@ if __name__=="__main__":
         th_wspeed = th.Thread(target=wmonitor.calculate_speed, args=[stop_event], daemon=True)
         th_wspeed.start(); th_wmonitor.start()
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
-        from sds011 import read_sds011, air_values
-        th_sds011 = th.Thread(target=read_sds011, args=config) # Assign true readings
+        from sds011 import MonitorAirQuality
+        air_monitor = MonitorAirQuality()
+        th_sds011 = th.Thread(target=air_monitor.monitor) # Assign true readings
+        th_sds011.start()
     else:
         data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
     if config['sensors'].getboolean('wdir'):
@@ -75,11 +77,6 @@ if __name__=="__main__":
 
     while True:
         start_time = time() # Capture loop start time
-        if 'th_sds011' in locals():
-            th_sds011.start()
-        
-        if 'th_rain' in locals():
-            data['rainfall'] = rmonitor.total_rain() # Get total rainfall and reset tips counter
         
         if config['sensors'].getboolean('bme280'):
             data['temperature'] = sensor.get_temperature(unit='F')
@@ -89,21 +86,23 @@ if __name__=="__main__":
         if 'th_wmonitor' and 'th_wspeed' in locals():
             if len(wmonitor.wind_list) > 0:
                 stop_event.set()
-                with wmonitor.wind_list_lock:
-                    data['wspeed'], data['wgusts'] = mean(wmonitor.wind_list), max(wmonitor.wind_list)
-                    wmonitor.wind_list.clear()
-                    stop_event.clear()
+                wmonitor.wind_count_lock.acquire()
+                data['wspeed'], data['wgusts'] = mean(wmonitor.wind_list), max(wmonitor.wind_list)
+                wmonitor.wind_list.clear()
+                wmonitor.wind_count_lock.release()
+                stop_event.clear()
             else:
                 data['wgusts'] = 0
-            #elif data['wspeed'] != 0 and data['wgusts'] != 0:
-                #data['wspeed'], data['wgusts'] = 0, 0
-
-        if 'th_sds011' in locals():
-            th_sds011.join()
-            data['pm25'], data['pm10'] = air_values['pm25'], air_values['pm10']
 
         if 'th_wdir' in locals():            
             data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees and reset readings to average
+        
+        if 'th_sds011' in locals():
+            data['pm25'], data['pm10'] = air_monitor.average()
+            air_monitor.pm10_total.clear(); air_monitor.pm25_total.clear()
+
+        if 'th_rain' in locals():
+            data['rainfall'] = rmonitor.total_rain() # Get total rainfall and reset tips counter
 
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
