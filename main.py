@@ -1,7 +1,8 @@
 from bme280pi import Sensor
 from sys import stdout
-import aprs, db, configparser, threading as th
+import aprs, configparser, threading as th
 from time import sleep, time
+from db import WeatherDatabase
 
 def start_bme280():
     try:
@@ -37,9 +38,10 @@ def wait_delay(start_time):
         stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
 
 if __name__=="__main__":
+    db = WeatherDatabase()
     config = configparser.ConfigParser()
     print("reading config file...")
-    config.read('wxstation.conf')
+    config.read('wxstation.conf')    
     if config['sensors'].getboolean('bme280'):
         sensor = start_bme280()
     data = enable_disable_sensors()
