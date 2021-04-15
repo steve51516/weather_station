@@ -1,18 +1,21 @@
 from gpiozero import Button
 
-bucket = Button(5)
+DEFAULT_RAIN_SENSOR = Button(5)
 #BUCKET_SIZE = 0.2794 # mm
 BUCKET_SIZE = 0.011 # inches
-tips = 0
 
-def bucket_tipped():
-    global tips
-    tips += 1
-    #print(f"Bucket tipped! Total rainfall calculated is {tips * BUCKET_SIZE}")
+class RainMonitor:
+    def __init__(self, BUCKET=BUCKET_SIZE, button=DEFAULT_RAIN_SENSOR):
+        self.tips = 0
+        self.button = button
+        self.bucket_size = BUCKET_SIZE
 
-def reset_rainfall():
-    global tips
-    tips = 0
+    def bucket_tipped(self):
+        self.tips += 1
+        #print(f"Bucket tipped! Total rainfall calculated is {self.tips * self.bucket_size}")
 
-def monitor_rainfall():
-    bucket.when_pressed = bucket_tipped
+    def reset_rainfall(self):
+        self.tips = 0
+
+    def monitor_rainfall(self):
+        self.button.when_pressed = self.bucket_tipped
