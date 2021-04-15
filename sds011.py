@@ -49,7 +49,7 @@ class MonitorAirQuality:
     
     def average(self):
         while True:
-            if not self.air_values_lock:
+            if not self.air_values_lock.locked():
                 if len(self.pm25_total) > 0 and len(self.pm10_total) > 0:
                     return mean(self.pm25_total), mean(self.pm10_total)
                 else:
