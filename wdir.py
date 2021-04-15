@@ -63,7 +63,6 @@ class WindDirectionMonitor:
                 avg = arc + 180
             elif s < 0 and c > 0:
                 avg = arc + 360
-            self.wind_angles.clear() # Clear readings to average
             return 0.0 if avg == 360 else round(avg)
         except ZeroDivisionError as e:
             print(f"ZeroDivisionError: {e}\nWind direction could not be calculated!")
