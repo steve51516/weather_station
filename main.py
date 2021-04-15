@@ -95,14 +95,15 @@ if __name__=="__main__":
                 data['wgusts'] = 0
 
         if 'th_wdir' in locals():            
-            data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees and reset readings to average
+            data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees
+            wdir_monitor.wind_angles.clear() # Clear readings to average
         
         if 'th_sds011' in locals():
             data['pm25'], data['pm10'] = air_monitor.average()
             air_monitor.pm10_total.clear(); air_monitor.pm25_total.clear()
 
         if 'th_rain' in locals():
-            data['rainfall'] = rmonitor.total_rain() # Get total rainfall and reset tips counter
+            data['rainfall'] = rmonitor.total_rain(); rmonitor.clear_total_rain()
 
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()

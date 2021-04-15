@@ -14,17 +14,32 @@ class RainMonitor:
         self.tips_lock = Lock()
 
     def bucket_tipped(self):
-        with self.tips_lock:
-            self.tips += 1
-            #print(f"Bucket tipped! Total rainfall calculated is {self.tips * self.bucket_size}")
+        while True:
+            if not self.tips_lock.locked():
+                self.tips_lock.acquire()
+                self.tips += 1
+                #print(f"Bucket tipped! Total rainfall calculated is {self.tips * self.bucket_size}")
+                self.tips_lock.release()
 
     def total_rain(self): # Convert tips to rain in hundreths of an inch and reset tips counter
         while True:
             if not self.tips_lock.locked():
+                self.tips_lock.acquire()
                 t_rain = self.tips * self.bucket_size
-                self.tips = 0
+                self.tips_lock.release()
                 return t_rain
             else:
+                sleep(2)
+
+    def clear_total_rain(self):
+        while True:
+            if not self.tips_lock.locked():
+                self.tips_lock.acquire()
+                self.tips = 0
+                self.tips_lock.release()
+                break
+            else:
+                print("RainMonitor thread locked! Waiting 2 seconds to reset tips...")
                 sleep(2)
 
     def monitor(self):
