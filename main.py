@@ -47,7 +47,7 @@ if __name__=="__main__":
         from rainfall import RainMonitor
         rmonitor = RainMonitor()
         print("Starting rainfall monitoring thread.")
-        th_rain = th.Thread(target=rmonitor.monitor_rainfall, daemon=True)
+        th_rain = th.Thread(target=rmonitor.rmonitor.monitor, daemon=True)
         th_rain.start()
     else:
         data['rainfall'] = 0
@@ -66,9 +66,10 @@ if __name__=="__main__":
     else:
         data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
     if config['sensors'].getboolean('wdir'):
-        from wdir import monitor_wdir, wdir_average
+        from wdir import WindDirectionMonitor
+        wdir_monitor = WindDirectionMonitor()
         print("Starting wind direction monitoring thread.")
-        th_wdir = th.Thread(target=monitor_wdir, daemon=True)
+        th_wdir = th.Thread(target=wdir_monitor.monitor, daemon=True)
         th_wdir.start()
     print("Done reading config file.\nStarting main program now.")
 
@@ -102,7 +103,7 @@ if __name__=="__main__":
             data['pm25'], data['pm10'] = air_values['pm25'], air_values['pm10']
 
         if 'th_wdir' in locals():            
-            data['wdir'] = wdir_average() # Record average wind direction in degrees and reset readings to average
+            data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees and reset readings to average
 
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
