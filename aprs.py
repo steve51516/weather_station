@@ -53,18 +53,29 @@ class SendAprs:
             tmp['wgusts'] = self.add_zeros(round(tmp['wgusts']))
             tmp['humidity'] = self.format_humidity(round(tmp['humidity']))
             tmp['ztime'] = time.strftime('%d%H%M', time.gmtime()) # Get zulu/UTC time
-            if self.format_rain(self.db.rain_avg(1)) == 0 and self.rmonitor.tips == 0:
-                tmp['rain1h'] = 0
+
+            all_rain_avgs = self.db.get_all_rain_avg()
+            if self.format_rain(all_rain_avgs['1']) == 0.0 and self.rmonitor.tips == 0:
+                tmp['rain1h'] = self.format_rain(all_rain_avgs['1'])
             elif self.rmonitor.tips > 0:
                 tmp['rain1h'] = self.format_rain(self.rmonitor.tips)
-            if self.format_rain(self.db.rain_avg(24)) == 0 and self.rmonitor.tips == 0:
-                tmp['rain24h'] = 0
+            else:
+                tmp['rain1h'] = self.format_rain(all_rain_avgs['1'])
+
+            if self.format_rain(all_rain_avgs['24']) == 0.0 and self.rmonitor.tips == 0:
+                tmp['rain24h'] = self.format_rain(all_rain_avgs['24'])
             elif self.rmonitor.tips > 0:
                 tmp['rain24h'] = self.format_rain(self.rmonitor.tips)
-            if self.format_rain(self.db.rain_avg(00)) == 0 and self.rmonitor.tips == 0:
-                tmp['rain00m'] = 0
+            else:
+                tmp['rain24h'] = self.format_rain(all_rain_avgs['24'])
+
+            if self.format_rain(all_rain_avgs['00']) == 0.0 and self.rmonitor.tips == 0:
+                tmp['rain00m'] = self.format_rain(all_rain_avgs['00'])
             elif self.rmonitor.tips > 0:
                 tmp['rain00m'] = self.format_rain(self.rmonitor.tips)
+            else:
+                tmp['rain00m'] = self.format_rain(all_rain_avgs['00'])
+            del(all_rain_avgs)
 
             tmp['wdir'] = self.add_zeros(tmp['wdir'])
 

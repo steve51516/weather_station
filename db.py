@@ -7,7 +7,7 @@ class WeatherDatabase:
         self.password = password
         self.host = host
         self.port = port
-        self.database = database                
+        self.database = database
 
     def db_connect(self):
         for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
@@ -49,9 +49,17 @@ class WeatherDatabase:
             query = """SELECT AVG(rainfall) FROM sensors where created between CURRENT_DATE() AND NOW() AND rainfall!=0;"""
         elif hours == 1 or 24: # Queries average ranfall for the past hour or 24 hours
             query = f"SELECT AVG(rainfall) FROM sensors WHERE created >= now() - INTERVAL {hours} HOUR AND rainfall!=0;"
+        else:
+            raise ValueError("rain average hours must be 00, 1, or 24.")
 
         conn = self.db_connect(); cur = conn.cursor()
         cur.execute(query)
         row = cur.fetchone()
         conn.close()
         return 0.0 if row[0] is None else row[0] # Rainfall readings of 0.000 will return NULL, return 0 if NULL
+
+    def get_all_rain_avg(self):
+        all_rain_avgs = {}
+        for hour in [ 00, 1, 24 ]:
+            all_rain_avgs[hour] = self.rain_avg(hour)
+        return all_rain_avgs
