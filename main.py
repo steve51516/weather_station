@@ -1,7 +1,9 @@
 from bme280pi import Sensor
 from sys import stdout
-import aprs, db, configparser, threading as th
+import aprs, configparser, threading as th
 from time import sleep, time
+from db import WeatherDatabase
+from aprs import SendAprs
 
 def start_bme280():
     try:
@@ -15,59 +17,74 @@ def start_bme280():
         print(f"{e}: Unable to get BME280 ChipID and Version")
     return sensor
 
-def enable_disable_sensors():
-    data = { 'callsign': config['aprs']['callsign'] }
+def enable_disable_sensors(): #TODO Set all required keys as 0 and find a new way to enable/disable sensors.
+    data = {
+        'callsign': config['aprs']['callsign'],
+        'wspeed': 0,
+        'wgusts': 0,
+        'wdir': 0,
+        'rain1h': 0,
+        'rain24h': 0,
+        'rain00m': 0
+    }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
         if config['sensors'].getboolean(item) is False: 
             data[item] = 0 # Zeros will be converted to "000" in aprs module
     return data
 
 def wait_delay(start_time):
+        seconds = 300
         end_time = time() # Capture end time
-        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        wait_time = round(seconds - (end_time - start_time)) # Calculate time to wait before restart loop
+        if wait_time < 0:
+            abs(wait_time)
+        elif wait_time == 0:
+            wait_time = 300
         print(f"Generating next report in {round((wait_time / 60), 2)} minutes")
         stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
 
 if __name__=="__main__":
+    db = WeatherDatabase(); aprs = SendAprs()
     config = configparser.ConfigParser()
     print("reading config file...")
-    config.read('wxstation.conf')
+    config.read('wxstation.conf')    
     if config['sensors'].getboolean('bme280'):
         sensor = start_bme280()
     data = enable_disable_sensors()
     if config['sensors'].getboolean('rain1h'):
-        from rainfall import tips, monitor_rainfall, reset_rainfall
+        from rainfall import RainMonitor
+        rmonitor = RainMonitor()
         print("Starting rainfall monitoring thread.")
-        th_rain = th.Thread(target=monitor_rainfall, daemon=True)
+        th_rain = th.Thread(target=rmonitor.monitor, daemon=True)
         th_rain.start()
     else:
         data['rainfall'] = 0
     if config['sensors'].getboolean('wspeed'):
-        from wspeed import monitor_wind, calculate_speed, wind_list
+        from wspeed import WindMonitor
         from statistics import mean
+        wmonitor = WindMonitor()
         print("Starting wind speed monitoring thread.")
-        th_wmonitor = th.Thread(target=monitor_wind, daemon=True)
-        th_wspeed = th.Thread(target=calculate_speed, daemon=True)
+        stop_event = th.Event()
+        th_wmonitor = th.Thread(target=wmonitor.monitor_wind, daemon=True)
+        th_wspeed = th.Thread(target=wmonitor.calculate_speed, args=[stop_event], daemon=True)
         th_wspeed.start(); th_wmonitor.start()
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
-        from sds011 import read_sds011, show_air_values, air_values
-        th_sds011 = th.Thread(target=read_sds011, args=config) # Assign true readings
+        from sds011 import MonitorAirQuality
+        air_monitor = MonitorAirQuality()
+        th_sds011 = th.Thread(target=air_monitor.monitor) # Assign true readings
+        th_sds011.start()
     else:
         data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
     if config['sensors'].getboolean('wdir'):
-        from wdir import monitor_wdir, wdir_average
+        from wdir import WindDirectionMonitor
+        wdir_monitor = WindDirectionMonitor()
         print("Starting wind direction monitoring thread.")
-        th_wdir = th.Thread(target=monitor_wdir, daemon=True)
+        th_wdir = th.Thread(target=wdir_monitor.monitor, daemon=True)
         th_wdir.start()
     print("Done reading config file.\nStarting main program now.")
 
     while True:
         start_time = time() # Capture loop start time
-        if 'th_sds011' in locals():
-            th_sds011.start()
-        
-        if 'th_rain' in locals():
-            data['rainfall'] = tips; reset_rainfall() # 0 if disabled or actual value if enabled, reset after saving value
         
         if config['sensors'].getboolean('bme280'):
             data['temperature'] = sensor.get_temperature(unit='F')
@@ -75,18 +92,26 @@ if __name__=="__main__":
             data['humidity'] = sensor.get_humidity()
 
         if 'th_wmonitor' and 'th_wspeed' in locals():
-            if len(wind_list) > 0:
-                data['wspeed'], data['wgusts'] = mean(wind_list), max(wind_list)
-                wind_list.clear()
+            if len(wmonitor.wind_list) > 0:
+                stop_event.set()
+                wmonitor.wind_count_lock.acquire()
+                data['wspeed'], data['wgusts'] = mean(wmonitor.wind_list), max(wmonitor.wind_list)
+                wmonitor.wind_list.clear()
+                wmonitor.wind_count_lock.release()
+                stop_event.clear()
             else:
-                data['wspeed'], data['wgusts'] = 0, 0
-
-        if 'th_sds011' in locals():
-            th_sds011.join()
-            data['pm25'], data['pm10'] = air_values['pm25'], air_values['pm10']
+                data['wgusts'], data['wspeed'] = 0, 0
 
         if 'th_wdir' in locals():            
-            data['wdir'] = wdir_average() # Record average wind direction in degrees and reset readings to average
+            data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees
+            wdir_monitor.wind_angles.clear() # Clear readings to average
+        
+        if 'th_sds011' in locals():
+            data['pm25'], data['pm10'] = air_monitor.average()
+            air_monitor.pm10_total.clear(); air_monitor.pm25_total.clear()
+
+        if 'th_rain' in locals():
+            data['rainfall'] = rmonitor.total_rain(); rmonitor.clear_total_rain()
 
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
