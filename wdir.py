@@ -46,6 +46,7 @@ class WindDirectionMonitor:
 
     def average(self):
         self.wind_angles
+        avg = 0.0
         sin_sum, cos_sum = 0.0, 0.0
         try:
             for angle in self.wind_angles:
