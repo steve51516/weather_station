@@ -3,6 +3,7 @@ from sys import stdout
 import aprs, configparser, threading as th
 from time import sleep, time
 from db import WeatherDatabase
+from aprs import SendAprs
 
 def start_bme280():
     try:
@@ -16,11 +17,15 @@ def start_bme280():
         print(f"{e}: Unable to get BME280 ChipID and Version")
     return sensor
 
-def enable_disable_sensors():
+def enable_disable_sensors(): #TODO Set all required keys as 0 and find a new way to enable/disable sensors.
     data = {
         'callsign': config['aprs']['callsign'],
         'wspeed': 0,
-        'wgusts': 0
+        'wgusts': 0,
+        'wdir': 0,
+        'rain1h': 0,
+        'rain24h': 0,
+        'rain00m': 0
     }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
         if config['sensors'].getboolean(item) is False: 
@@ -28,8 +33,9 @@ def enable_disable_sensors():
     return data
 
 def wait_delay(start_time):
+        seconds = 300
         end_time = time() # Capture end time
-        wait_time = round(300 - (end_time - start_time)) # Calculate time to wait before restart loop
+        wait_time = round(seconds - (end_time - start_time)) # Calculate time to wait before restart loop
         if wait_time < 0:
             abs(wait_time)
         elif wait_time == 0:
@@ -38,7 +44,7 @@ def wait_delay(start_time):
         stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
 
 if __name__=="__main__":
-    db = WeatherDatabase()
+    db = WeatherDatabase(); aprs = SendAprs()
     config = configparser.ConfigParser()
     print("reading config file...")
     config.read('wxstation.conf')    
@@ -94,7 +100,7 @@ if __name__=="__main__":
                 wmonitor.wind_count_lock.release()
                 stop_event.clear()
             else:
-                data['wgusts'] = 0
+                data['wgusts'], data['wspeed'] = 0, 0
 
         if 'th_wdir' in locals():            
             data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees
