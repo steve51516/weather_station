@@ -11,7 +11,7 @@ class RainMonitor:
     def __init__(self, BUCKET=0.011, button=Button(5)):
         self.tips = 0
         self.button = button
-        self.bucket_size = BUCKET_SIZE
+        self.bucket_size = BUCKET
         self.tips_lock = Lock()
 
     def bucket_tipped(self):
