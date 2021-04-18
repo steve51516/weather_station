@@ -60,6 +60,6 @@ class WeatherDatabase:
 
     def get_all_rain_avg(self):
         all_rain_avgs = {}
-        for hour in [ 00, 1, 24 ]:
+        for hour in [ '00', '1', '24' ]:
             all_rain_avgs[hour] = self.rain_avg(hour)
         return all_rain_avgs
