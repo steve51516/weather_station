@@ -25,7 +25,10 @@ def enable_disable_sensors(): #TODO Set all required keys as 0 and find a new wa
         'wdir': 0,
         'rain1h': 0,
         'rain24h': 0,
-        'rain00m': 0
+        'rain00m': 0,
+        'pm25_avg': 0,
+        'pm10_avg': 0,
+        'rainfall': 0
     }
     for item in config['sensors']: # If an item in config is boolean false assign value of 0 to signify uncollected data
         if config['sensors'].getboolean(item) is False: 
@@ -57,8 +60,6 @@ if __name__=="__main__":
         print("Starting rainfall monitoring thread.")
         th_rain = th.Thread(target=rmonitor.monitor, daemon=True)
         th_rain.start()
-    else:
-        data['rainfall'] = 0
     if config['sensors'].getboolean('wspeed'):
         from wspeed import WindMonitor
         from statistics import mean
@@ -71,11 +72,12 @@ if __name__=="__main__":
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
         from sds011 import MonitorAirQuality
         print("Starting AirQuality monitoring thread.")
-        air_monitor = MonitorAirQuality()
-        th_sds011 = th.Thread(target=air_monitor.monitor) # Assign true readings
+        if config['serial']['tty'] in config and config['serial']['tty'] is not None:
+            air_monitor = MonitorAirQuality(tty=config['serial']['tty'], interval=config['serial']['interval'])
+        else:
+            air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
+        th_sds011 = th.Thread(target=air_monitor.monitor)
         th_sds011.start()
-    else:
-        data['pm25_avg'], data['pm10_avg'] = 0, 0 # Assign 0 value if disabled
     if config['sensors'].getboolean('wdir'):
         from wdir import WindDirectionMonitor
         wdir_monitor = WindDirectionMonitor()
@@ -108,6 +110,7 @@ if __name__=="__main__":
             wdir_monitor.wind_angles.clear() # Clear readings to average
         
         if 'th_sds011' in locals():
+            th_sds011.join()
             data['pm25_avg'], data['pm10_avg'] = air_monitor.average()
             air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear()
 
