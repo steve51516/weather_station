@@ -29,7 +29,7 @@ class WeatherDatabase:
     def read_save_sensors(self, data):
         sensors_insert = """INSERT INTO sensors(stationid, ambient_temperature, wind_direction, wind_speed, wind_gust_speed, humidity, air_pressure, rainfall, pm25, pm10) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
-        data_tuple = (data['callsign'], data['temperature'], data['wdir'], data['wspeed'], data['wgusts'], data['humidity'], round(data['pressure'], 2), data['rainfall'], data['pm25'], data['pm10'])
+        data_tuple = (data['callsign'], data['temperature'], data['wdir'], data['wspeed'], data['wgusts'], data['humidity'], round(data['pressure'], 2), data['rainfall'], data['pm25_avg'], data['pm10_avg'])
         self.conn = self.db_connect()
         cur = self.conn.cursor()
         cur.execute(sensors_insert, data_tuple)

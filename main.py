@@ -75,7 +75,7 @@ if __name__=="__main__":
         th_sds011 = th.Thread(target=air_monitor.monitor) # Assign true readings
         th_sds011.start()
     else:
-        data['pm25'], data['pm10'] = 0, 0 # Assign 0 value if disabled
+        data['pm25_avg'], data['pm10_avg'] = 0, 0 # Assign 0 value if disabled
     if config['sensors'].getboolean('wdir'):
         from wdir import WindDirectionMonitor
         wdir_monitor = WindDirectionMonitor()
@@ -108,7 +108,7 @@ if __name__=="__main__":
             wdir_monitor.wind_angles.clear() # Clear readings to average
         
         if 'th_sds011' in locals():
-            data['pm25'], data['pm10'] = air_monitor.average()
+            data['pm25_avg'], data['pm10_avg'] = air_monitor.average()
             air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear()
 
         if 'th_rain' in locals():
