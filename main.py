@@ -70,6 +70,7 @@ if __name__=="__main__":
         th_wspeed.start(); th_wmonitor.start()
     if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
         from sds011 import MonitorAirQuality
+        print("Starting AirQuality monitoring thread.")
         air_monitor = MonitorAirQuality()
         th_sds011 = th.Thread(target=air_monitor.monitor) # Assign true readings
         th_sds011.start()
@@ -108,7 +109,7 @@ if __name__=="__main__":
         
         if 'th_sds011' in locals():
             data['pm25'], data['pm10'] = air_monitor.average()
-            air_monitor.pm10_total.clear(); air_monitor.pm25_total.clear()
+            air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear()
 
         if 'th_rain' in locals():
             data['rainfall'] = rmonitor.total_rain(); rmonitor.clear_total_rain()
