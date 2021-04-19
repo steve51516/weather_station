@@ -31,7 +31,7 @@ create_user() {
     grep wxstation /etc/passwd &> /dev/null
     if [[ "$?" != "0" ]]; then
         useradd -m -d /opt/wxstation -c "wxstation service account" -r wxstation
-        usermod -aG tty wxstation
+        usermod -aG dialout,spi,i2c,gpio wxstation
     fi
     cp wxstation.service /etc/systemd/system/
     systemctl enable wxstation.service
