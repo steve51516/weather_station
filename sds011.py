@@ -7,12 +7,13 @@ from time import sleep
 class MonitorAirQuality:
     def __init__(self, baudrate=9600, tty="/dev/ttyUSB0"):
         self.air_values = {
-            'pm25': 0,
-            'pm10': 0,
-            'pm25_avg': 0,
-            'pm10_avg': 0
+            'pm25': 0.0,
+            'pm10': 0.0,
+            'pm25_total': [],
+            'pm10_total': [],
+            'pm25_errors': 0,
+            'pm10_errors': 0
         }
-        self.pm25_total, self.pm10_total = [], []
         self.baudrate = baudrate
         self.tty = tty
         self.air_values_lock = Lock()
@@ -31,8 +32,17 @@ class MonitorAirQuality:
 
             self.air_values['pm25'] = int.from_bytes(data[3], byteorder='little') * 256 + int.from_bytes(data[2], byteorder='little') / 10
             self.air_values['pm10'] = int.from_bytes(data[5], byteorder='little') * 256 + int.from_bytes(data[4], byteorder='little') / 10
-            self.pm25_total.append(self.air_values['pm25'])
-            self.pm10_total.append(self.air_values['pm10'])
+
+            if self.air_values['pm25'] < 999.0:
+                self.air_values['pm25_total'].append(self.air_values['pm25'])
+            else:
+                self.air_values['pm10_errors'] += 1
+                print(f"Error: PM25 value {self.air_values['pm25']} is out of range")
+            if self.air_values['pm10'] < 999.0:
+                self.air_values['pm10_total'].append(self.air_values['pm10'])
+            else:
+                self.air_values['pm10_errors'] += 1
+                print(f"Error: PM10 value {self.air_values['pm10']} is out of range")
 
         except ser.Error as error:
             print(f"Error connecting to serial port: {error}")
@@ -47,11 +57,11 @@ class MonitorAirQuality:
         print("PM2.5, µg/m3: ", self.air_values['pm25'])
         print("PM10, µg/m3: ", self.air_values['pm10'])
     
-    def average(self):
+    def average(self): # Return average from total readings
         while True:
             if not self.air_values_lock.locked():
-                if len(self.pm25_total) > 0 and len(self.pm10_total) > 0:
-                    return mean(self.pm25_total), mean(self.pm10_total)
+                if len(self.air_values['pm25_total']) > 0 and len(self.air_values['pm10_total']) > 0:
+                    return round(mean(self.air_values['pm25_total']), 2), round(mean(self.air_values['pm10_total']), 2)
                 else:
                     return 0, 0
             else:
