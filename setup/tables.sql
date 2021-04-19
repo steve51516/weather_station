@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS weather.sensors(
     stationid VARCHAR(10),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ambient_temperature DECIMAL(6,2) NOT NULL,
-    wind_direction DECIMAL(6,2),
+    wind_direction SMALLINT,
     wind_speed DECIMAL(6,2),
     wind_gust_speed DECIMAL(6,2),
     humidity DECIMAL(6,2) NOT NULL,
