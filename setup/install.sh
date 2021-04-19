@@ -19,7 +19,7 @@ fi
 # Set environment variables
 error_msg="Errors occured. Please review"
 debian_pkgs="mariadb-server libmariadb3 libmariadb-dev"
-py_pkgs="mariadb bme280pi gpiozero pyserial aprslib"
+py_pkgs="mariadb bme280pi gpiozero pyserial aprslib py-sds011"
 user="wxstation"
 # database setup variables
 root_password='password'
