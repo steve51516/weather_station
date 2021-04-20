@@ -58,15 +58,50 @@ install_pkgs() {
 # Create and setup mariadb
 setup_db() {
     local sqlscript="$(pwd)/tables.sql"
-    printf "Creating $db_name database\n"
-    mysql -e "CREATE DATABASE IF NOT EXISTS $db_name;"
-    echo "creating $user in mariadb"
-    mysql -e "CREATE USER IF NOT EXISTS '$user'@localhost IDENTIFIED BY '$db_userpass';"
-    echo "Securing mariadb root account"
-    mysql -e "UPDATE mysql.user SET Password = PASSWORD('$root_password') WHERE User = 'root'"
-    mysql -e "GRANT ALL PRIVILEGES ON \`$db_name\`.* TO '$user'@localhost;"
-    mysql -e "FLUSH PRIVILEGES;"
-    mysql < $sqlscript $db_name
+    if [[ -f "$sqlscript" ]]; then
+        printf "Creating $db_name database\n"
+        mysql -e "CREATE DATABASE IF NOT EXISTS $db_name;"
+        echo "creating $user in mariadb"
+        mysql -e "CREATE USER IF NOT EXISTS '$user'@localhost IDENTIFIED BY '$db_userpass';"
+        echo "Securing mariadb root account"
+        mysql -e "UPDATE mysql.user SET Password = PASSWORD('$root_password') WHERE User = 'root'"
+        mysql -e "GRANT ALL PRIVILEGES ON \`$db_name\`.* TO '$user'@localhost;"
+        mysql -e "FLUSH PRIVILEGES;"
+        mysql < $sqlscript $db_name
+    else
+        echo "File $sqlscript does not exist. This script must be ran from the setup directory."
+    fi
+}
+
+disable_leds() {
+    lscpu | grep ^Model\ name: | grep Broadcom\ BCM 2>&1 >> /dev/null
+    if [[ "$?" -eq 0 ]]; then
+        echo "Running on raspberry pi, disabling LEDs..."
+        echo none > /sys/class/leds/led0/trigger
+        echo none > /sys/class/leds/led1/trigger
+        echo 0 > /sys/class/leds/led0/brightness
+        echo 0 > /sys/class/leds/led1/brightness
+        echo "Setting LEDs to disabled on boot in /etc/rc.local"
+        tvservice -o
+        echo "Disabled HDMI port"
+        if [[ -f /etc/rc.local ]]; then
+            grep /sys/class/leds/led0/trigger /etc/rc.local
+            if [[ ! "$?" -eq 0 ]]; then
+                sed -i s/exit\ 0//g file.txt
+                echo -e "echo none > /sys/class/leds/led0/trigger\necho none > /sys/class/leds/led1/trigger\necho 0 > /sys/class/leds/led0/brightness\necho 0 > /sys/class/leds/led1/brightness\nexit0" >> /etc/rc.local
+                echo "LEDs set to disabled on boot in /etc/rc.local"
+            fi
+            grep "tvservice" /etc/rc.local
+            if [[ ! "$?" -eq 0 ]]; then
+                sed -i s/exit\ 0//g file.txt
+                echo "tvservice -o" >> /etc/rc.local
+                echo "Disabled HDMI port on boot"
+        else
+            echo "/etc/rc.local does not exist. Creating file."
+            echo -e "echo none > /sys/class/leds/led0/trigger\necho none > /sys/class/leds/led1/trigger\necho 0 > /sys/class/leds/led0/brightness\necho 0 > /sys/class/leds/led1/brightness\nexit0" > /etc/rc.local
+            fi
+        fi
+    fi
 }
 
 if [[ ! -z $1 ]]; then
@@ -87,6 +122,7 @@ else
     create_user
     install_pkgs
     setup_db
+    disable_leds
     echo "All done!"
 fi
 exit 0
