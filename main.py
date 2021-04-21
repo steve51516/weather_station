@@ -69,26 +69,27 @@ if __name__=="__main__":
         th_wmonitor = th.Thread(target=wmonitor.monitor_wind, daemon=True)
         th_wspeed = th.Thread(target=wmonitor.calculate_speed, args=[stop_event], daemon=True)
         th_wspeed.start(); th_wmonitor.start()
-    if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
-        from pysds011 import MonitorAirQuality
-        print("Starting AirQuality monitoring thread.")
-        if config['serial']['tty'] in config and config['serial']['tty'] is not None:
-            air_monitor = MonitorAirQuality(tty=config['serial']['tty'], interval=config['serial']['interval'])
-        else:
-            air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
-        th_sds011 = th.Thread(target=air_monitor.monitor)
-        th_sds011.start()
     if config['sensors'].getboolean('wdir'):
         from wdir import WindDirectionMonitor
         wdir_monitor = WindDirectionMonitor()
         print("Starting wind direction monitoring thread.")
         th_wdir = th.Thread(target=wdir_monitor.monitor, daemon=True)
         th_wdir.start()
+    if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
+        from pysds011 import MonitorAirQuality
+        print("Loading AirQuality monitoring modules.")
+        if config['serial']['tty'] in config and config['serial']['tty'] is not None:
+            air_monitor = MonitorAirQuality(tty=config['serial']['tty'], interval=config['serial']['interval'])
+        else:
+            air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
     print("Done reading config file.\nStarting main program now.")
 
     while True:
         start_time = time() # Capture loop start time
-        
+        if config['serial'].getboolean('enabled'): # If SDS011 is enabled make and start thread
+            th_sds011 = th.Thread(target=air_monitor.monitor)
+            th_sds011.start()
+
         if config['sensors'].getboolean('bme280'):
             data['temperature'] = sensor.get_temperature(unit='F')
             data['pressure'] = sensor.get_pressure()
@@ -109,14 +110,23 @@ if __name__=="__main__":
             data['wdir'] = wdir_monitor.average() # Record average wind direction in degrees
             wdir_monitor.wind_angles.clear() # Clear readings to average
         
-        if 'th_sds011' in locals():
-            th_sds011.join()
-            data['pm25_avg'], data['pm10_avg'] = air_monitor.average()
-            air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear()
+        if config['serial'].getboolean('enabled'): # If SDS011 is enabled collect readings
+            from pysds011 import MonitorAirQuality
+            print("Starting AirQuality monitoring thread.")
+            if config['serial']['tty'] in config and config['serial']['tty'] is not None:
+                air_monitor = MonitorAirQuality(tty=config['serial']['tty'], interval=config['serial']['interval'])
+            else:
+                air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
+            th_sds011 = th.Thread(target=air_monitor.monitor)
             th_sds011.start()
 
         if 'th_rain' in locals():
             data['rainfall'] = rmonitor.total_rain(); rmonitor.clear_total_rain()
+        
+        if config['serial'].getboolean('enabled'):
+            th_sds011.join() # wait for thread to complete before getting average readings
+            data['pm25_avg'], data['pm10_avg'] = air_monitor.average()
+            air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear() # Reset readings used for averages
 
         th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
         th_sensorsave.start(); th_senddata.start()
