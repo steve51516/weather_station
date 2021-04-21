@@ -7,9 +7,12 @@ usage() {
     printf "Script usage\n\t--database-only - Setup database only\n\t--pkgs-only - Install debian and python packages only\n\t --help - Print this message\n"
 }
 
+red="\033[0;31m"
+creset="\033[0m"
+
 if [[ "$(whoami)" != "root" ]]; then
-    echo -e "\n\033[0;31mThis script must be ran as root!"
-    echo -e "EXITING! RUN AS ROOT!\n\033[0m"
+    echo -e "\n${red}This script must be ran as root user or with sudo!"
+    echo -e "Exiting...\n${creset}"
     usage
     exit 0
 else
@@ -17,7 +20,7 @@ else
 fi
 
 # Set environment variables
-error_msg="Errors occured. Please review"
+error_msg="${red}Errors occured. Please review${creset}"
 debian_pkgs="mariadb-server libmariadb3 libmariadb-dev"
 py_pkgs="mariadb bme280pi gpiozero pyserial aprslib py-sds011"
 user="wxstation"
