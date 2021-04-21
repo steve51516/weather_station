@@ -87,20 +87,17 @@ class SendAprs:
         packet = self.make_packet(data, config)
         if config.getboolean('aprs', 'sendall'):
             for server in config['servers']:
-                for i in range(1, 4): # Retry 3 times increasing delay by 10 seconds each time
-                    delay = i * 10
-                    AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
-                    try:
-                        AIS.connect()
-                        AIS.sendall(packet)
-                        print(f"Packet transmitted to {config['servers'][server]} at {time.strftime('%Y-%m-%d %H:%M', time.gmtime())} UTC time")
-                    except Exception as error:
-                        print(f"{error}\nRetry number: {i}\n Trying again in {delay} seconds...")
-                        time.sleep(delay)
-                        continue
-                    finally:
-                        AIS.close()
-                transmitted = 1
+                AIS = aprslib.IS(config['aprs']['callsign'], config['aprs']['passwd'], config['servers'][server], config['aprs']['port'])
+                try:
+                    AIS.connect()
+                    AIS.sendall(packet)
+                    print(f"Packet transmitted to {config['servers'][server]} at {time.strftime('%Y-%m-%d %H:%M', time.gmtime())} UTC time")
+                    break
+                except Exception as e:
+                    print(f"An exception occured trying to send packet to {server}\nException: {e}")
+                finally:
+                    AIS.close()
+            transmitted = 1
         else:
             transmitted = 0
         self.db.read_save_packet(packet[:-len(config['aprs']['comment'])], transmitted) # Store packet in database without comment field
