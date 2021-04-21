@@ -3,11 +3,13 @@ import aprslib, time
 from math import trunc
 from db import WeatherDatabase
 from rainfall import RainMonitor
+import logging
 
 class SendAprs:
-    def __init__(self):
+    def __init__(self, loglevel="logging.DUBUG"):
         self.db = WeatherDatabase()
         self.rmonitor = RainMonitor()
+        logging.basicConfig(level=loglevel)
         
     # Convert temperature, wind direction, wind speed, and wind gusts to 3 digits
     def add_zeros(self, num):
