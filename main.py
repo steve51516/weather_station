@@ -83,6 +83,9 @@ if __name__=="__main__":
             air_monitor = MonitorAirQuality(tty=config['serial']['tty'], interval=config['serial']['interval'])
         else:
             air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
+    if config['si4713'].getboolean('enabled'):
+        from si4713 import si4713
+        fm_radio = si4713()
     print("Done reading config file.\nStarting main program now.")
 
     while True:
@@ -129,7 +132,20 @@ if __name__=="__main__":
             data['pm25_avg'], data['pm10_avg'] = air_monitor.average()
             air_monitor.air_values['pm25_total'].clear(); air_monitor.air_values['pm10_total'].clear() # Reset readings used for averages
 
-        th_senddata, th_sensorsave = th.Thread(target=aprs.send_data(data, config)), th.Thread(target=db.read_save_sensors(data))
-        th_sensorsave.start(); th_senddata.start()
-        th_senddata.join(); th_sensorsave.join()
+        if config['tcpip'].getboolean('enabled'):
+            th_senddata_tcpip = th.Thread(target=aprs.send_data(data, config))
+        if fm_radio in locals():
+            th_fm_radio= th.Thread(target=fm_radio(aprs.make_packet(data, config)))
+
+        th_sensorsave = th.Thread(target=db.read_save_sensors(data))
+        if th_senddata_tcpip in locals():
+            th_senddata_tcpip.start()
+        if th_fm_radio in locals():
+            th_fm_radio.start()
+        th_sensorsave.start()
+        if th_senddata_tcpip in locals():
+            th_senddata_tcpip.join()
+        if th_fm_radio in locals():
+            th_fm_radio.join()
+        th_sensorsave.join()
         wait_delay(start_time)
