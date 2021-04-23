@@ -8,7 +8,8 @@ from aprs import SendAprs
 def start_bme280():
     try:
         sensor = Sensor(0x77)
-    except Exception:
+    except Exception as e:
+        print(f"Exception occured while setting bme280 to address 0x77: {e}\nTrying address 0x76")
         sensor = Sensor(0x76)
     try:
         chipid, version = sensor._get_info_about_sensor()
