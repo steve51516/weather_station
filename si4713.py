@@ -2,7 +2,7 @@ import board, busio, adafruit_si4713, digitalio, os
 from playsound import playsound
 
 class si4713:
-    def __init__(self, data, frequency=102300, rds=False, led=True, soundfile='/tmp/aprs_report.wav'):
+    def __init__(self, frequency=102300, rds=False, led=True, soundfile='/tmp/aprs_report.wav'):
         try:
             self.i2c = busio.I2C(board.SCL, board.SDA)
             self.si_reset = digitalio.DigitalInOut(board.D5)
@@ -39,9 +39,9 @@ class si4713:
             print(f'{0:0.3f} mhz = {1} dBuV'.format(f_khz/1000.0, noise))
         print(f"Scan completed.\nBest FM Channel is {best_freq / 1000} MHz at noise level: {lowest_noise)} dBuV")
     
-    def manage_soundfile(self, data, make=True):
+    def manage_soundfile(self, packet, make=True):
         if make:
-            cmd = f"echo -n {data['packet']} | gen_packets -o {self.soundfile}}"
+            cmd = f"echo -n {packet} | gen_packets -o {self.soundfile}}"
             os.system(cmd)
         else:
             if os.path.isfile(self.soundfile):
@@ -49,8 +49,9 @@ class si4713:
             else:
                 print(f"File not found, cannot delete {self.soundfile}")
         
-    def transmit(self):
-        if os.path.isfile(self.soundfile):       
+    def transmit(self, packet):
+        if os.path.isfile(self.soundfile):
+            self.manage_soundfile(packet)
             self.tx_power = 115 # Turn on transmitter with max power
             print("Transmitting at {0:0.3f} mhz".format(self.si4713.tx_frequency_khz / 1000.0))
             print("Transmitter power: {0} dBuV".format(self.si4713.tx_power))
