@@ -47,10 +47,10 @@ def wait_delay(start_time):
         stdout.flush(); sleep(wait_time) # Flush buffered output and wait exactly 5 minutes from start time
 
 if __name__=="__main__":
-    db = WeatherDatabase(); aprs = SendAprs(config['aprs']['loglevel'])
     config = configparser.ConfigParser()
     print("reading config file...")
-    config.read('wxstation.conf')    
+    config.read('wxstation.conf')
+    db = WeatherDatabase(); aprs = SendAprs(config['aprs']['loglevel'])
     if config['sensors'].getboolean('bme280'):
         sensor = start_bme280()
     data = enable_disable_sensors()
