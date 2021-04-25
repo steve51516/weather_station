@@ -12,7 +12,6 @@ class MonitorAirQuality:
             'pm25_errors': 0,
             'pm10_errors': 0
         }
-        self.air_values_lock = Lock()
         self.interval = float(interval)
         self.sensor = SDS011(serial_port=tty, baudrate=baudrate)
 
