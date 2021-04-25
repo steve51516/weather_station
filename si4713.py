@@ -37,11 +37,11 @@ class si4713:
                 lowest_noise = noise
                 best_freq = f_khz
             print(f'{0:0.3f} mhz = {1} dBuV'.format(f_khz/1000.0, noise))
-        print(f"Scan completed.\nBest FM Channel is {best_freq / 1000} MHz at noise level: {lowest_noise)} dBuV")
+        print(f"Scan completed.\nBest FM Channel is {best_freq / 1000} MHz at noise level: {lowest_noise} dBuV")
     
     def manage_soundfile(self, packet, make=True):
         if make:
-            cmd = f"echo -n {packet} | gen_packets -o {self.soundfile}}"
+            cmd = f"echo -n {packet} | gen_packets -o {self.soundfile}"
             os.system(cmd)
         else:
             if os.path.isfile(self.soundfile):
