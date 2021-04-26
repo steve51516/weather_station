@@ -51,7 +51,7 @@ if __name__=="__main__":
     config = configparser.ConfigParser()
     print("reading config file...")
     config.read('wxstation.conf')
-    db = WeatherDatabase(); aprs = SendAprs(config['aprs']['loglevel'])
+    db = WeatherDatabase(password=config['hardware']['db_pass'],host=config['hardware']['db_host']); aprs = SendAprs(config['aprs']['loglevel'])
     if config['sensors'].getboolean('bme280'):
         sensor = start_bme280()
     data = enable_disable_sensors()
@@ -134,18 +134,21 @@ if __name__=="__main__":
 
         if config['hardware'].getboolean('tcpip'):
             th_senddata_tcpip = th.Thread(target=aprs.send_data(data, config))
-        if fm_radio in locals():
+
+        if 'fm_radio' in locals():
             th_fm_radio= th.Thread(target=fm_radio(aprs.make_packet(data, config)))
 
+
         th_sensorsave = th.Thread(target=db.read_save_sensors(data))
-        if th_senddata_tcpip in locals():
+        if 'th_senddata_tcpip' in locals():
             th_senddata_tcpip.start()
-        if th_fm_radio in locals():
+
+        if 'th_fm_radio' in locals():
             th_fm_radio.start()
         th_sensorsave.start()
-        if th_senddata_tcpip in locals():
+        if 'th_senddata_tcpip' in locals():
             th_senddata_tcpip.join()
-        if th_fm_radio in locals():
+        if 'th_fm_radio' in locals():
             th_fm_radio.join()
         th_sensorsave.join()
         wait_delay(start_time)
