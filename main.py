@@ -137,18 +137,18 @@ if __name__=="__main__":
             th_senddata_tcpip = th.Thread(target=aprs.send_data(data, config))
 
         if 'fm_transmitter' in locals():            
-            th_fm_radio= th.Thread(target=fm_transmitter.manage_soundfile(aprs.make_packet(data, config)))
+            th_fm_transmit= th.Thread(target=fm_transmitter.manage_soundfile(aprs.make_packet(data, config)))
 
         th_sensorsave = th.Thread(target=db.read_save_sensors(data))
         if 'th_senddata_tcpip' in locals():
             th_senddata_tcpip.start()
 
-        if 'th_fm_radio' in locals():
-            th_fm_radio.start()
+        if 'fm_transmitter' in locals():
+            th_fm_transmit.start()
         th_sensorsave.start()
         if 'th_senddata_tcpip' in locals():
             th_senddata_tcpip.join()
-        if 'th_fm_radio' in locals():
-            th_fm_radio.join()
+        if 'fm_transmitter' in locals():
+            th_fm_transmit.join()
         th_sensorsave.join()
         wait_delay(start_time)
