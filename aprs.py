@@ -6,8 +6,8 @@ from rainfall import RainMonitor
 import logging
 
 class SendAprs:
-    def __init__(self, loglevel="logging.DUBUG"):
-        self.db = WeatherDatabase()
+    def __init__(self, db, loglevel="logging.DUBUG"):
+        self.db = db
         self.rmonitor = RainMonitor()
         logging.basicConfig(level=loglevel)
         
@@ -81,9 +81,9 @@ class SendAprs:
 
             tmp['wdir'] = self.add_zeros(tmp['wdir'])
 
-            packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{tmp['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
+            self.packet = f"{config['aprs']['callsign']}>APRS,TCPIP*:@{tmp['ztime']}z{config['aprs']['longitude']}/{config['aprs']['latitude']}_{tmp['wdir']}/{tmp['wspeed']}g{tmp['wgusts']}t{tmp['temperature']}r{tmp['rain1h']}p{tmp['rain24h']}P{tmp['rain00m']}b{tmp['pressure']}h{tmp['humidity']}{config['aprs']['comment']}"
             del(tmp) # Clean up temporary dictionary
-            return packet
+            return self.packet
             
     def send_data(self, data, config):
         packet = self.make_packet(data, config)

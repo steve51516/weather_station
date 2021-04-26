@@ -1,7 +1,7 @@
 import board, busio, adafruit_si4713, digitalio, os
 from playsound import playsound
 
-class transmitter:
+class FM_Transmitter:
     def __init__(self, frequency=102300, rds=False, led=True, soundfile='/tmp/aprs_report.wav'):
         try:
             self.i2c = busio.I2C(board.SCL, board.SDA)

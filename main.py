@@ -51,7 +51,8 @@ if __name__=="__main__":
     config = configparser.ConfigParser()
     print("reading config file...")
     config.read('wxstation.conf')
-    db = WeatherDatabase(password=config['hardware']['db_pass'],host=config['hardware']['db_host']); aprs = SendAprs(config['aprs']['loglevel'])
+    db = WeatherDatabase(password=config['hardware']['db_pass'],host=config['hardware']['db_host'])
+    aprs = SendAprs(db, config['aprs']['loglevel'])
     if config['sensors'].getboolean('bme280'):
         sensor = start_bme280()
     data = enable_disable_sensors()
@@ -84,8 +85,8 @@ if __name__=="__main__":
         else:
             air_monitor = MonitorAirQuality(interval=config['serial']['interval'])
     if config['hardware'].getboolean('si4713'):
-        from si4713 import si4713
-        fm_radio = si4713()
+        from si4713 import FM_Transmitter
+        fm_transmitter = FM_Transmitter()
     print("Done reading config file.\nStarting main program now.")
 
     while True:
@@ -135,9 +136,8 @@ if __name__=="__main__":
         if config['hardware'].getboolean('tcpip'):
             th_senddata_tcpip = th.Thread(target=aprs.send_data(data, config))
 
-        if 'fm_radio' in locals():
-            th_fm_radio= th.Thread(target=fm_radio(aprs.make_packet(data, config)))
-
+        if 'fm_transmitter' in locals():            
+            th_fm_radio= th.Thread(target=fm_transmitter.manage_soundfile(aprs.make_packet(data, config)))
 
         th_sensorsave = th.Thread(target=db.read_save_sensors(data))
         if 'th_senddata_tcpip' in locals():
